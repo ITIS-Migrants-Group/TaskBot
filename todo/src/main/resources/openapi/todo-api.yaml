@@ -1,0 +1,211 @@
+openapi: 3.1.0
+info:
+  title: Scrapper API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8065
+paths:
+  /tasks/{tg-id}:
+    post:
+      summary: Создать новую задачу
+      operationId: createTask
+      tags:
+        - Task
+      parameters:
+        - name: tg-id
+          in: path
+          required: true
+          description: Идентификатор чата Telegram пользователя
+          schema:
+            type: integer
+            format: int64
+        - name: title
+          in: query
+          required: false
+          description: Заголовок задачи
+          schema:
+            type: string
+        - name: deadline
+          in: query
+          required: false
+          description: Дата и время дедлайна (в формате ISO 8601 с смещением)
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Задача успешно создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponseDto'
+        '400':
+          description: Неверные параметры запроса
+        '500':
+          description: Внутренняя ошибка сервера
+
+    get:
+      summary: Получить задачи с фильтрацией по статусу и дедлайну
+      operationId: getFilteredTasks
+      tags:
+        - Task
+      parameters:
+        - name: tg-id
+          in: path
+          required: true
+          description: Идентификатор чата Telegram пользователя
+          schema:
+            type: integer
+            format: int64
+        - name: status
+          in: query
+          required: true
+          description: Статус задачи
+          schema:
+            type: string
+        - name: ended_at
+          in: query
+          required: true
+          description: Дедлайн (в формате ISO 8601 с смещением) – вероятно, фильтр по <= дедлайна
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Список задач, удовлетворяющих фильтрам
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskResponseDto'
+        '400':
+          description: Неверные параметры запроса
+        '500':
+          description: Внутренняя ошибка сервера
+
+  /tasks/{tg-id}/search:
+    get:
+      summary: Поиск задач по ключевым словам
+      operationId: getByKeyWords
+      tags:
+        - Task
+      parameters:
+        - name: tg-id
+          in: path
+          required: true
+          description: Идентификатор чата Telegram пользователя
+          schema:
+            type: integer
+            format: int64
+        - name: query
+          in: query
+          required: true
+          description: Ключевые слова для поиска
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Список найденных задач
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskResponseDto'
+        '400':
+          description: Неверные параметры запроса
+        '500':
+          description: Внутренняя ошибка сервера
+
+  /tasks/{task-id}:
+    patch:
+      summary: Обновить статус задачи
+      operationId: updateStatus
+      tags:
+        - Task
+      parameters:
+        - name: task-id
+          in: path
+          required: true
+          description: UUID задачи
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskUpdateDto'
+      responses:
+        '200':
+          description: Статус обновлён, возвращена обновлённая задача
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponseDto'
+        '400':
+          description: Неверные параметры запроса или тела
+        '404':
+          description: Задача с таким ID не найдена
+        '500':
+          description: Внутренняя ошибка сервера
+
+    delete:
+      summary: Удалить задачу по ID
+      operationId: deleteTaskById
+      tags:
+        - Task
+      parameters:
+        - name: task-id
+          in: path
+          required: true
+          description: UUID задачи
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Задача успешно удалена (тело ответа пустое)
+        '404':
+          description: Задача с таким ID не найдена
+        '500':
+          description: Внутренняя ошибка сервера
+
+components:
+  schemas:
+    TaskResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Уникальный идентификатор задачи
+        tgChatId:
+          type: integer
+          format: int64
+          description: Идентификатор чата Telegram пользователя
+        title:
+          type: string
+          description: Заголовок задачи
+        createdAt:
+          type: string
+          format: date-time
+          description: Дата и время создания задачи
+        endedAt:
+          type: string
+          format: date-time
+          description: Дедлайн задачи
+        status:
+          type: string
+          description: Статус задачи
+    TaskUpdateDto:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          description: Новый статус задачи
+  
