@@ -19,11 +19,16 @@ account
 ```
 ### Endpoints
 ```http request
-GET /users/{tg-id}
+GET /users
+
+{
+    "tgId": 20,
+    "username": "test"
+}
 
 returns
 {
-"tg-id": 20,
+"tgId": 20,
 "username": "test"
 }
 ```
@@ -269,6 +274,21 @@ notification_type {
 }
 ```
 #### Endpoint
+```http request
+GET /notifications/{tg-id}/search?query={}
+
+retunrs
+{
+    "id": "abrakadabraUUID",
+    "ownerId": 20,
+    "title": "notify me"
+    "taskId": abrakadabraUUID2,
+    "type": "ONCE",
+    "notify_at": "2026-07-10T10:26:30+04:00",
+    "period": null,
+    "is_active": true
+}
+```
 ```http request
 POST /notifications/{tg-id}
 
