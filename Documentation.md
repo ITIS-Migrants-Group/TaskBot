@@ -282,7 +282,7 @@ retunrs
     "id": "abrakadabraUUID",
     "ownerId": 20,
     "title": "notify me"
-    "taskId": abrakadabraUUID2,
+    "taskId": "abrakadabraUUID2",
     "type": "ONCE",
     "notify_at": "2026-07-10T10:26:30+04:00",
     "period": null,
@@ -294,6 +294,7 @@ POST /notifications/{tg-id}
 
 {
     "title": "notify me",
+    "taskId": "abrakadabraUUID2",
     "type": "ONCE",
     "notify_at": "2026-07-10T10:26:30+04:00",
     "period": null
