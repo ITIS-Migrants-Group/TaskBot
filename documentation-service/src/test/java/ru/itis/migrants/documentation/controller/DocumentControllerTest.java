@@ -90,9 +90,14 @@ class DocumentControllerTest {
     }
 
     @Test
-    void deleteExistingDocumentReturnsNoContent() throws Exception {
+    void deleteExistingDocumentReturnsDeletedDocument() throws Exception {
+        when(documentService.delete(OWNER_ID, DOCUMENT_ID)).thenReturn(response());
+
         mockMvc.perform(delete("/documents/{tgId}/{documentId}", OWNER_ID, DOCUMENT_ID))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(DOCUMENT_ID.toString()))
+                .andExpect(jsonPath("$.ownerId").value(OWNER_ID))
+                .andExpect(jsonPath("$.content").value("Mi nota importante"));
     }
 
     @Test

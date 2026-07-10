@@ -54,9 +54,11 @@ public class DocumentService {
     }
 
     @Transactional
-    public void delete(Long ownerId, UUID documentId) {
+    public DocumentResponse delete(Long ownerId, UUID documentId) {
         Document document = documentRepository.findByIdAndOwnerId(documentId, ownerId)
                 .orElseThrow(() -> new DocumentNotFoundException(documentId, ownerId));
+        DocumentResponse response = documentMapper.toResponse(document);
         documentRepository.delete(document);
+        return response;
     }
 }

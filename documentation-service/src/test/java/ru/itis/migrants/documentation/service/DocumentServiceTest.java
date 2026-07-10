@@ -113,12 +113,15 @@ class DocumentServiceTest {
     }
 
     @Test
-    void deleteRemovesDocumentOwnedByUser() {
+    void deleteRemovesAndReturnsDocumentOwnedByUser() {
         Document document = document(DOCUMENT_ID, OWNER_ID, "own", CREATED_AT);
         when(documentRepository.findByIdAndOwnerId(DOCUMENT_ID, OWNER_ID)).thenReturn(Optional.of(document));
 
-        documentService.delete(OWNER_ID, DOCUMENT_ID);
+        DocumentResponse response = documentService.delete(OWNER_ID, DOCUMENT_ID);
 
+        assertThat(response.id()).isEqualTo(DOCUMENT_ID);
+        assertThat(response.ownerId()).isEqualTo(OWNER_ID);
+        assertThat(response.content()).isEqualTo("own");
         verify(documentRepository).delete(document);
     }
 

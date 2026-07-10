@@ -56,11 +56,10 @@ public class DocumentController {
     }
 
     @DeleteMapping("/{tgId}/{documentId}")
-    public ResponseEntity<Void> delete(
+    public ResponseEntity<DocumentResponse> delete(
             @PathVariable @Positive(message = "Telegram id must be positive") Long tgId,
             @PathVariable UUID documentId
     ) {
-        documentService.delete(tgId, documentId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(documentService.delete(tgId, documentId));
     }
 }
