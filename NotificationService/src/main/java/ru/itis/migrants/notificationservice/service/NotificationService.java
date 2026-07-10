@@ -28,7 +28,7 @@ public class NotificationService {
                 .taskId(request.taskId().orElse(null))
                 .ownerId(tgId)
                 .type(request.type())
-                .notify_at(request.notifyAt())
+                .notifyAt(request.notifyAt())
                 .period(request.period().orElse(null))
                 .isActive(Boolean.TRUE)
                 .build();

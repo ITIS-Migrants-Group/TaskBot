@@ -29,17 +29,16 @@ public class Notification {
     @Column(nullable = false, length = 1023)
     private String title;
 
-    @Column(nullable = true)
     private UUID taskId;
 
     @Enumerated(EnumType.STRING)
     private NotificationType type;
 
     @Column(nullable = false)
-    private OffsetDateTime notify_at;
+    private OffsetDateTime notifyAt;
 
     @JdbcType(PostgreSQLIntervalSecondJdbcType.class)
-    @Column(nullable = true, columnDefinition = "interval")
+    @Column(columnDefinition = "interval")
     private Duration period;
 
     @Column(nullable = false)

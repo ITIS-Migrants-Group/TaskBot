@@ -16,7 +16,7 @@ public interface NotificationJpaRepository extends JpaRepository<Notification, U
     @Query("""
     FROM Notification n
     WHERE n.isActive = TRUE
-    AND n.notify_at < :time
+    AND n.notifyAt < :time
     """)
     List<Notification> findForScheduler(@Param("time") OffsetDateTime time);
 }
