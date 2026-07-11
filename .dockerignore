@@ -1,0 +1,10 @@
+.git
+**/target
+**/.idea
+**/.env
+*.iml
+*.iws
+*.ipr
+documentation-service/mvnw
+documentation-service/mvnw.cmd
+documentation-service/.mvn

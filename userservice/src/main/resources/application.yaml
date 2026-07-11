@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: userservice
+  datasource:
+    url: jdbc:postgresql://localhost:5432/taskbot_db
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:mm3503933mm}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+starter:
+  logging:
+    enabled: true
+    pointcuts:
+      - "execution(* ru.itis.migrants.userservice.service.*.*(..))"
+      - "execution(* ru.itis.migrants.userservice.controller.*.*(..))"
+    file:
+      directory: logs
+      enabled: true
+      pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"
+      timestamp-pattern: "yyyy-MM-dd_HH-mm-ss"
