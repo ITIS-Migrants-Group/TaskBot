@@ -1,0 +1,15 @@
+server:
+  port: 8065
+spring:
+  application:
+    name: todo
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/todo_db}
+    username: ${SPRING_DATASOURCE_USERNAME:todo_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:todo_password}
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+
+
