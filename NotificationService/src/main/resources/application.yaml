@@ -1,0 +1,43 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: NotificationService
+  config:
+    import: optional:file:.env[.properties]
+
+
+  datasource:
+    url: ${NOTIFICATION_SERVICE_DB_URL}
+    username: ${NOTIFICATION_SERVICE_DB_USER}
+    password: ${NOTIFICATION_SERVICE_DB_PASSWORD}
+  liquibase:
+    url: ${NOTIFICATION_SERVICE_DB_URL}
+    user: ${NOTIFICATION_SERVICE_DB_USER}
+    password: ${NOTIFICATION_SERVICE_DB_PASSWORD}
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+      hibernate.format_sql: true
+  rabbitmq:
+    password: ${RABBIT_MQ_PASSWORD}
+    username: ${RABBIT_MQ_USER}
+    publisher-confirm-type: simple
+    publisher-returns: true
+    host: localhost
+    port: 5672
+    template:
+      mandatory: true
+
+
+property:
+  rabbitmq:
+    queue: notification.push.queue
+    exchange: notification.topic.exchange
+    push-key: notification.push.*
+    max-retries: 3
+    retry-timeout: 1000

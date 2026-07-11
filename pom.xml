@@ -17,6 +17,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>NotificationService</module>
         <module>userservice</module>
         <module>migrants-logging-spring-boot-starter</module>
         <module>documentation-service</module>

@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0001-create-notification
+      author: vexi
+      changes:
+        - sqlFile:
+            path: /db/changelog/raw_sql/ddl_create_notifications.sql

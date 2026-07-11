@@ -5,6 +5,116 @@
 ### API Gateway
 Точка входа с для клиента.
 
+- при активации бота регистрируем пользователя в системе
+```http request
+POST /api/v1/users
+
+{
+    "tgId": 20,
+    "username": "vasya_pupkin"
+}
+```
+
+- выдаем пользователю список задач с 2мя фильтрами
+```http request
+
+GET /api/v1/tasks/{tg-id}?status={}&ended_at={}
+
+{
+    "id": "abracadabraUUID",
+    "userId": 20,
+    "title": "task #1",
+    "at_created": "2026-07-10T10:26:30+04:00",
+    "at_ended": "2026-07-15T12:00:00+04:00",
+    "status": "NEW"
+}
+```
+- создаем новую задачу + добавить проверка что deadline >= now()
+```http request
+POST /api/v1/tasks/{tg-id}
+
+{
+    "title": "task #1",
+    "deadline": "2026-07-15T12:00:00+04:00",
+    "notify_for": сюда передается ISO 8601 как пример PT30M (30 минут) в боте создадим enum с такими 
+}
+
+returns CREATED
+{
+    "id": "abracadabraUUID",
+    "userId": 20,
+    "title": "task #1",
+    "at_created": "2026-07-10T10:26:30+04:00",
+    "at_ended": "2026-07-15T12:00:00+04:00",
+    "status": "NEW"
+}
+```
+**Примечание**: после создания таски создать нотификацию
+```http request
+POST /notifications/{tg-id}
+
+{
+    "title": текст сделать стандартным Задача: {title задачи},
+    "type": тип обязательно ONCE,
+    "notify_at": "2026-07-10T10:26:30+04:00",
+    "period": null
+}
+```
+- завершение задачи 
+```http request
+PUT /api/v1/notification/{}
+```
+
+- удаляем задачу
+```http request
+DELETE /api/v1/tasks/{tg-id}/{id}
+
+returns NO_CONTENT
+```
+**Примечание**: после удаления таски выключить нотификацию
+```http request
+
+POST /notifications/{tg-id}
+
+{
+    "title": "notify me",
+    "type": "ONCE",
+    "notify_at": "2026-07-10T10:26:30+04:00",
+    "period": null
+}
+
+retunrs
+{
+    "id": "abrakadabraUUID",
+    "ownerId": 20,
+    "title": "notify me"
+    "taskId": abrakadabraUUID2,
+    "type": "ONCE",
+    "notify_at": "2026-07-10T10:26:30+04:00",
+    "period": null,
+    "is_active": true
+}
+```
+
+- 
+```http request
+PUT /api/v1/tasks/{tg-id}/{task-id}
+
+{
+    "status": "COMPLETED"
+}
+
+returns
+{
+    "id": "abracadabraUUID",
+    "userId": 20,
+    "title": "task #1",
+    "created_at": "2026-07-10T10:26:30+04:00",
+    "ended_at": "2026-07-15T12:00:00+04:00",
+    "status": "COMPLETED"
+}
+```
+
 ### User Service
 Управление пользователями системы.
 
@@ -282,7 +392,7 @@ retunrs
     "id": "abrakadabraUUID",
     "ownerId": 20,
     "title": "notify me"
-    "taskId": abrakadabraUUID2,
+    "taskId": "abrakadabraUUID2",
     "type": "ONCE",
     "notify_at": "2026-07-10T10:26:30+04:00",
     "period": null,
@@ -294,6 +404,7 @@ POST /notifications/{tg-id}
 
 {
     "title": "notify me",
+    "taskId": "abrakadabraUUID2",
     "type": "ONCE",
     "notify_at": "2026-07-10T10:26:30+04:00",
     "period": null
