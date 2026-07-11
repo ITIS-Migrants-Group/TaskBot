@@ -19,6 +19,7 @@
     <modules>
         <module>userservice</module>
         <module>migrants-logging-spring-boot-starter</module>
+        <module>documentation-service</module>
     </modules>
 
     <properties>

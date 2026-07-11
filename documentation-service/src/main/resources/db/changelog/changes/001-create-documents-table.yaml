@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-documents-table
+      author: documentation-service
+      changes:
+        - createTable:
+            tableName: documents
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: owner_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: documents
+            indexName: idx_documents_owner_id
+            columns:
+              - column:
+                  name: owner_id
+        - createIndex:
+            tableName: documents
+            indexName: idx_documents_owner_id_created_at
+            columns:
+              - column:
+                  name: owner_id
+              - column:
+                  name: created_at
