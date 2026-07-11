@@ -12,6 +12,7 @@ import ru.itis.migrants.todo.models.Task;
 import ru.itis.migrants.todo.models.TaskStatus;
 import ru.itis.migrants.todo.repositories.TaskRepository;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,20 +27,23 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskResponseDto create(TaskDto taskDto) {
         Task task = taskRepository.save(mapper.toEntity(taskDto));
-
         return mapper.toResponseDto(task);
     }
 
     @Override
-    public List<TaskResponseDto> getAllByStatusAndDeadline(TaskFilterRequestDto taskFilterRequestDto) {
-        List<Task> tasks = taskRepository.findAllByTgChatIdAndStatusAndEndedAt(
-                taskFilterRequestDto.tgChatId(),
-                TaskStatus.valueOf(taskFilterRequestDto.status()),
-                taskFilterRequestDto.endedAt());
-
-        return tasks.stream()
-                .map(mapper::toResponseDto)
-                .toList();
+    public List<TaskResponseDto> getTasks(Long tgChatId, String status, OffsetDateTime deadline) {
+        List<Task> tasks;
+        if (status == null && deadline == null) {
+            tasks = taskRepository.findAllByTgChatId(tgChatId);
+        } else if (status != null && deadline != null) {
+            tasks = taskRepository.findAllByTgChatIdAndStatusAndEndedAt(
+                    tgChatId, TaskStatus.valueOf(status), deadline);
+        } else if (status != null) {
+            tasks = taskRepository.findAllByTgChatIdAndStatus(tgChatId, TaskStatus.valueOf(status));
+        } else {
+            tasks = taskRepository.findAllByTgChatIdAndEndedAt(tgChatId, deadline);
+        }
+        return tasks.stream().map(mapper::toResponseDto).toList();
     }
 
     @Override

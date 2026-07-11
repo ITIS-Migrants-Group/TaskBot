@@ -1,0 +1,28 @@
+package ru.itis.migrants.bot.models;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.itis.migrants.bot.models.enums.DialogState;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class UserDialogData {
+
+    private DialogState state = DialogState.IDLE;
+
+    private String title;
+
+    private String deadline;
+
+    private String notifyPeriod;
+
+    private String contactName;
+    private String phoneNumber;
+    private String email;
+    private String company;
+    private String note;
+}
