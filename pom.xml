@@ -17,6 +17,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>documentation-service</module>
     </modules>
 
     <url/>
