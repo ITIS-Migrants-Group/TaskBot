@@ -1,10 +1,17 @@
+server:
+  port: ${USER_SERVICE_PORT:8090}
+
 spring:
   application:
-    name: userservice
+    name: user-service
+  config:
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:../.env[.properties]
   datasource:
-    url: jdbc:postgresql://localhost:5432/taskbot_db
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:mm3503933mm}
+    url: ${USER_SERVICE_DB_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update

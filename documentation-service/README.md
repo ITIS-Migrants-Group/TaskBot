@@ -33,19 +33,17 @@ document {
 
 | Variable | Default |
 | --- | --- |
-| `DOCUMENTATION_SERVICE_PORT` | `8084` |
-| `DOCUMENTATION_POSTGRES_PORT` | `5436` |
-| `DOCUMENTATION_DB_NAME` | `documentation_db` |
-| `DOCUMENTATION_DB_URL` | `jdbc:postgresql://localhost:5436/documentation_db` |
-| `DOCUMENTATION_DB_USER` | `documentation_user` |
-| `DOCUMENTATION_DB_PASSWORD` | `documentation_password` |
+| `DOCUMENTATION_SERVICE_PORT` | `8092` |
+| `DOCUMENTATION_SERVICE_DB_URL` | `jdbc:postgresql://documentation-db:5432/documentation_service_db` |
+| `DATABASE_USER` | `taskbot` |
+| `DATABASE_PASSWORD` | `taskbot` |
 
 ## Run locally
 
 Start PostgreSQL:
 
 ```bash
-docker compose up -d documentation-postgres
+docker compose up -d documentation-db
 ```
 
 Run the service from the repository root:
@@ -62,7 +60,7 @@ From `documentation-service`:
 docker compose up --build
 ```
 
-The service listens on `http://localhost:8084`.
+The service listens on `http://localhost:8092`.
 
 ## Liquibase
 
@@ -79,7 +77,7 @@ The initial migration creates `documents` with indexes on `owner_id` and `(owner
 ### Create
 
 ```bash
-curl -X POST http://localhost:8084/documents/20 \
+curl -X POST http://localhost:8092/documents/20 \
   -H "Content-Type: application/json" \
   -d '{"content":"Mi nota importante"}'
 ```
@@ -87,19 +85,19 @@ curl -X POST http://localhost:8084/documents/20 \
 ### List by owner
 
 ```bash
-curl http://localhost:8084/documents/20
+curl http://localhost:8092/documents/20
 ```
 
 ### Search by owner
 
 ```bash
-curl "http://localhost:8084/documents/20/search?query=importante"
+curl "http://localhost:8092/documents/20/search?query=importante"
 ```
 
 ### Delete
 
 ```bash
-curl -X DELETE http://localhost:8084/documents/20/{documentId}
+curl -X DELETE http://localhost:8092/documents/20/{documentId}
 ```
 
 ## API Gateway
@@ -107,10 +105,10 @@ curl -X DELETE http://localhost:8084/documents/20/{documentId}
 No API Gateway module exists in this checkout. The route needed by the gateway is:
 
 ```text
-/documents/** -> http://documentation-service:8084
+/documents/** -> http://documentation-service:8092
 ```
 
-For Docker Compose, the internal service URL is `http://documentation-service:8084`.
+For Docker Compose, the internal service URL is `http://documentation-service:8092`.
 
 ## Tests
 

@@ -9,16 +9,17 @@ COPY migrants-logging-spring-boot-starter/pom.xml migrants-logging-spring-boot-s
 COPY todo/pom.xml todo/pom.xml
 COPY userservice/pom.xml userservice/pom.xml
 
-RUN mvn -B -pl documentation-service -am dependency:go-offline
+RUN mvn -B -pl userservice -am dependency:go-offline
 
-COPY documentation-service/src documentation-service/src
-RUN mvn -B -pl documentation-service -am package -DskipTests
+COPY migrants-logging-spring-boot-starter/src migrants-logging-spring-boot-starter/src
+COPY userservice/src userservice/src
+RUN mvn -B -pl userservice -am package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
-COPY --from=build /workspace/documentation-service/target/documentation-service-*.jar app.jar
+COPY --from=build /workspace/userservice/target/*.jar app.jar
 
-EXPOSE 8092
+EXPOSE 8090
 
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]

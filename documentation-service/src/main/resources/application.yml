@@ -1,14 +1,18 @@
 server:
-  port: ${DOCUMENTATION_SERVICE_PORT:8084}
+  port: ${DOCUMENTATION_SERVICE_PORT:8092}
 
 spring:
   application:
     name: documentation-service
+  config:
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:../.env[.properties]
 
   datasource:
-    url: ${DOCUMENTATION_DB_URL:jdbc:postgresql://localhost:5436/documentation_db}
-    username: ${DOCUMENTATION_DB_USER:documentation_user}
-    password: ${DOCUMENTATION_DB_PASSWORD:documentation_password}
+    url: ${DOCUMENTATION_SERVICE_DB_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
 
   jpa:
     hibernate:
