@@ -1,4 +1,4 @@
-package ru.itis.migrants.bot.commands;
+package ru.itis.migrants.bot.commands.impl;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.BotCommand;
@@ -9,7 +9,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.itis.migrants.bot.models.CommandType;
+import ru.itis.migrants.bot.models.enums.CommandType;
 
 @Slf4j
 @Component

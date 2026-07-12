@@ -1,4 +1,4 @@
-package ru.itis.migrants.bot.commands.properties;
+package ru.itis.migrants.bot.properties;
 
 import jakarta.validation.constraints.NotEmpty;
 import java.time.Duration;
