@@ -1,0 +1,39 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1783851854942-1
+      author: vexi (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_contact
+                  name: id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: owner_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(100)
+              - column:
+                  name: phone_number
+                  type: VARCHAR(20)
+              - column:
+                  name: email
+                  type: VARCHAR(300)
+              - column:
+                  name: company
+                  type: VARCHAR(300)
+              - column:
+                  name: note
+                  type: VARCHAR(500)
+            tableName: contact
+

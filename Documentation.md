@@ -495,7 +495,7 @@ returns
 ]
 ```
 ```http request
-GET /contacts/search?query={}
+GET /contacts/{tg-id}/search?query={}
 
 returns
 [
