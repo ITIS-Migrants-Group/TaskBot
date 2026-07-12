@@ -2,5 +2,3 @@ databaseChangeLog:
   - include:
       file: changes/001-create-documents-table.yaml
       relativeToChangelogFile: true
-  - include:
-      file: db/changelog/0001-create-contact.yaml
