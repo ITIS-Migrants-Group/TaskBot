@@ -1,21 +1,22 @@
 server:
-  port: 8081
+  port: ${NOTIFICATION_SERVICE_PORT:8093}
 
 spring:
   application:
-    name: NotificationService
+    name: notification-service
   config:
-    import: optional:file:.env[.properties]
-
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:../.env[.properties]
 
   datasource:
     url: ${NOTIFICATION_SERVICE_DB_URL}
-    username: ${NOTIFICATION_SERVICE_DB_USER}
-    password: ${NOTIFICATION_SERVICE_DB_PASSWORD}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
   liquibase:
     url: ${NOTIFICATION_SERVICE_DB_URL}
-    user: ${NOTIFICATION_SERVICE_DB_USER}
-    password: ${NOTIFICATION_SERVICE_DB_PASSWORD}
+    user: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
   jpa:
     show-sql: true
     hibernate:
@@ -28,8 +29,8 @@ spring:
     username: ${RABBIT_MQ_USER}
     publisher-confirm-type: simple
     publisher-returns: true
-    host: localhost
-    port: 5672
+    host: ${RABBIT_MQ_HOST:localhost}
+    port: ${RABBIT_MQ_PORT:5672}
     template:
       mandatory: true
 

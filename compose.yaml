@@ -1,20 +1,140 @@
-version: '3'
-
 services:
   rabbitmq:
-    image: rabbitmq:management
-    container_name: rabbitmq
+    image: rabbitmq:3-management
     restart: unless-stopped
     ports:
       - "5672:5672"
       - "15672:15672"
-
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBIT_MQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBIT_MQ_PASSWORD}
-
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
-      - rabbitmq_vol:/var/liq/rabbitmq
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  notification-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: notification_service_db
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - notification_db_data:/var/lib/postgresql/data
+
+  documentation-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: documentation_service_db
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - documentation_db_data:/var/lib/postgresql/data
+
+  todo-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: todo_service_db
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - todo_db_data:/var/lib/postgresql/data
+
+  user-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: user_service_db
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: NotificationService/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      RABBIT_MQ_HOST: rabbitmq
+    ports:
+      - "${NOTIFICATION_SERVICE_PORT:-8093}:${NOTIFICATION_SERVICE_PORT:-8093}"
+    depends_on:
+      notification-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  documentation-service:
+    build:
+      context: .
+      dockerfile: documentation-service/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${DOCUMENTATION_SERVICE_PORT:-8092}:${DOCUMENTATION_SERVICE_PORT:-8092}"
+    depends_on:
+      documentation-db:
+        condition: service_healthy
+
+  todo-service:
+    build:
+      context: .
+      dockerfile: todo/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${TODO_SERVICE_PORT:-8091}:${TODO_SERVICE_PORT:-8091}"
+    depends_on:
+      todo-db:
+        condition: service_healthy
+
+  user-service:
+    build:
+      context: .
+      dockerfile: userservice/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${USER_SERVICE_PORT:-8090}:${USER_SERVICE_PORT:-8090}"
+    depends_on:
+      user-db:
+        condition: service_healthy
 
 volumes:
-  rabbitmq_vol:
+  rabbitmq_data:
+  notification_db_data:
+  documentation_db_data:
+  todo_db_data:
+  user_db_data:
