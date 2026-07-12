@@ -1,10 +1,11 @@
-package ru.itis.migrants.bot.commands;
+package ru.itis.migrants.bot.commands.impl;
 
-import backend.academy.linktracker.bot.components.command.handlers.CommandHandler;
 import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import lombok.extern.slf4j.Slf4j;
+import ru.itis.migrants.bot.commands.CommandHandler;
 
 @Slf4j
 public class AbstractCommandHandler implements CommandHandler {
@@ -22,6 +23,16 @@ public class AbstractCommandHandler implements CommandHandler {
 
     @Override
     public void handle(Update update) {}
+
+    protected boolean validateUpdate(Update update) {
+        Message message = update.message();
+        if (message == null) {
+            return false;
+        }
+
+        String text = message.text();
+        return text != null && !text.isBlank();
+    }
 
     protected void sendMessageToUser(long chatId, String messageForClient, String command) {
         log.atDebug()

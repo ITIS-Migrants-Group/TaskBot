@@ -10,7 +10,7 @@ import ru.itis.migrants.bot.models.enums.DialogState;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDialogData {
+public class TaskDialogData {
 
     private DialogState state = DialogState.IDLE;
 
@@ -19,10 +19,4 @@ public class UserDialogData {
     private String deadline;
 
     private String notifyPeriod;
-
-    private String contactName;
-    private String phoneNumber;
-    private String email;
-    private String company;
-    private String note;
 }

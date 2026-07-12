@@ -1,10 +1,8 @@
-package ru.itis.migrants.bot.models;
+package ru.itis.migrants.bot.models.enums;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 
-@AllArgsConstructor
 @ToString
 @Getter
 public enum CommandType {
@@ -12,7 +10,6 @@ public enum CommandType {
     TASKS("/tasks", "Получение задач(с и без фильтров)"),
     ADDTASK("/addtask", "Создание новой задачи"),
     COMPLETETASK("/completetask", "Завершить задачу"),
-    DELETETASK("/deletetask", "Удалить задачу"),
     CONTACTS("/contacts", "Просмотр контактов"),
     ADDCONTACT("/addcontact", "Добавить контакт"),
     EDITCONTACT("/editcontact", "Редактировать контакт"),
@@ -33,6 +30,12 @@ public enum CommandType {
 
     CommandType(String type, String description) {
         this(type, description, true);
+    }
+
+    CommandType(String type, String description, boolean enabled) {
+        this.type = type;
+        this.description = description;
+        this.enabled = enabled;
     }
 
     public static CommandType getCommandTypeFromString(String text) {

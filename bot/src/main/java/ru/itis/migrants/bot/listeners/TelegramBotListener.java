@@ -1,6 +1,6 @@
-package backend.academy.linktracker.bot.listeners;
+package ru.itis.migrants.bot.listeners;
 
-import backend.academy.linktracker.bot.components.TelegramUpdateDispatcher;
+
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
@@ -9,6 +9,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.itis.migrants.bot.services.TelegramUpdateDispatcher;
 
 @Slf4j
 @RequiredArgsConstructor
