@@ -34,10 +34,11 @@ public interface TaskClient {
     /**
      * Получение всех задач пользователя
      */
-    @GetExchange("/users/{tg-id}")
+    @GetExchange("/{tg-id}")
     ResponseEntity<List<TaskResponse>> getAll(
             @PathVariable("tg-id") Long tgId,
-            @RequestParam(required = false) String status
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) OffsetDateTime at_ended
     );
 
     /**
@@ -52,11 +53,12 @@ public interface TaskClient {
     /**
      * Удаление задачи
      */
-    @DeleteExchange("/{task-id}")
+    @DeleteExchange("/{task-id}/{id}")
     ResponseEntity<Void> deleteTask(
-            @PathVariable("task-id") Long taskId
+            @PathVariable("task-id") Long taskId,
+            @PathVariable Long id
     );
+
+    @GetExchange("/search")
+    ResponseEntity<List<TaskResponse>> search(@RequestParam String query);
 }
-
-// DTO классы для TaskClient
-

@@ -17,18 +17,18 @@ import ru.itis.migrants.apigateway.dto.response.NotificationResponse;
 public interface NotificationClient {
 
     @PostExchange("/{tg-id}")
-    ResponseEntity<NotificationResponse> createNotification(
+    ResponseEntity<NotificationResponse> create(
             @PathVariable("tg-id") Long tgId,
             @RequestBody CreateNotificationRequest request
     );
 
     @PutExchange
-    ResponseEntity<NotificationResponse> updateNotification(
+    ResponseEntity<NotificationResponse> update(
             @RequestBody UpdateNotificationRequest request
     );
 
     @GetExchange("/{notification-id}")
-    ResponseEntity<NotificationResponse> getNotification(
+    ResponseEntity<NotificationResponse> get(
             @PathVariable("notification-id") Long notificationId
     );
 }
