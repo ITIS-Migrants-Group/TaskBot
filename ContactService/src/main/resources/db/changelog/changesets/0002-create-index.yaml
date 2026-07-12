@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0002-create-index
+      author: vexi
+      changes:
+        - sqlFile:
+            path: /db/changelog/raw_sql/ddl-create-tsvector.sql

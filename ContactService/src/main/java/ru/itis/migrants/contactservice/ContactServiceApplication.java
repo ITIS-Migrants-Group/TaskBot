@@ -1,4 +1,4 @@
-package ru.itis.migrants.notificationservice;
+package ru.itis.migrants.contactservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,10 +8,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @ConfigurationPropertiesScan
 @EnableScheduling
-public class NotificationServiceApplication {
+public class ContactServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(NotificationServiceApplication.class, args);
+        SpringApplication.run(ContactServiceApplication.class, args);
     }
 
 }
