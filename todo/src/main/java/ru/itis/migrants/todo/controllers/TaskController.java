@@ -38,11 +38,11 @@ public class TaskController implements TasksApi {
     @GetMapping("/{tg-id}")
     public ResponseEntity<List<TaskResponseDto>> getFilteredTasks(
             @PathVariable("tg-id") Long tgChatId,
-            @RequestParam("status") String status,
-            @RequestParam("ended_at") OffsetDateTime deadline
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "ended_at", required = false) OffsetDateTime deadline
     ) {
         return ResponseEntity.ok(
-                taskService.getAllByStatusAndDeadline(new TaskFilterRequestDto(tgChatId, status, deadline))
+                taskService.getTasks(tgChatId, status, deadline)
         );
     }
 
