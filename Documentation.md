@@ -2,9 +2,27 @@
 ### Компоненты проекта
 ### TgBot
 Клиентское приложение в виде телеграм бота
+
+|   КОМАНДА    |                     МЕТОД API                     |                                                             ПРИМЕЧАНИЕ                                                             |
+|:------------:|:-------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------:|
+|   `/start`   |              `POST /api/v1/register`              |                                сначала получить пользователя по чату, если его нет зарегистрировать                                |
+| `/task new`  |         `POST /api/v1/tasks/{tg-id}`              |                                         после вызова бот дает ввести необходимые параметры                                         |
+| `/task list` | `GET /api/v1/tasks/{tg-id}?status={}&ended_at={}` | после вызова выдает выбрать один из статусов NEW/COMPLETED и время дедлайна, список задач выводится с кнопками ЗАВЕРШИТЬ и УДАЛИТЬ |
+|      ``      |                                                   |                                                                                                                                    |
+
 ### API Gateway
 Точка входа с для клиента.
 
+- получить пользователя
+```http request
+GET /api/v1/users/{tg-id}
+
+returns
+{
+"tgId": 20,
+"username": "test"
+}
+```
 - при активации бота регистрируем пользователя в системе
 ```http request
 POST /api/v1/users
@@ -36,7 +54,10 @@ POST /api/v1/tasks/{tg-id}
 {
     "title": "task #1",
     "deadline": "2026-07-15T12:00:00+04:00",
-    "notify_for": сюда передается ISO 8601 как пример PT30M (30 минут) в боте создадим enum с такими 
+    "notify_for": сюда передается ISO 8601 как пример PT30M (30 минут) 
+    в боте создадим enum с такими это время за которое нужно напомнит, то есть 
+    если PT30M то напоминаем за 30 минут до дедлайна, это означает что время notify_at(POST /notifications/{tg-id})
+    нужно уменьшить на этот параметр
 }
 
 returns CREATED
@@ -62,7 +83,7 @@ POST /notifications/{tg-id}
 ```
 - завершение задачи 
 ```http request
-PUT /api/v1/notification/{}
+PUT /api/v1/notification/{id}
 ```
 
 - удаляем задачу
@@ -96,7 +117,7 @@ retunrs
 }
 ```
 
-- 
+- изменение статуса задачи
 ```http request
 PUT /api/v1/tasks/{tg-id}/{task-id}
 
@@ -114,7 +135,192 @@ returns
     "status": "COMPLETED"
 }
 ```
+**Примечание**: если задача в статусе COMPLETED выключить уведомление
+```http request
 
+POST /notifications/{tg-id}
+
+{
+    "title": "notify me",
+    "type": "ONCE",
+    "notify_at": "2026-07-10T10:26:30+04:00",
+    "period": null
+}
+
+retunrs
+{
+    "id": "abrakadabraUUID",
+    "ownerId": 20,
+    "title": "notify me"
+    "taskId": abrakadabraUUID2,
+    "type": "ONCE",
+    "notify_at": "2026-07-10T10:26:30+04:00",
+    "period": null,
+    "is_active": true
+}
+```
+
+- добавить новое уведомление
+```http request
+
+POST /api/v1/notifications/{tg-id}
+
+{
+    "title": "notify me",
+    "taskId": "abrakadabraUUID2",
+    "type": "ONCE",
+    "notify_at": "2026-07-10T10:26:30+04:00",
+    "period": null
+}
+
+returns
+{
+    "id": "abrakadabraUUID",
+    "ownerId": 20,
+    "title": "notify me"
+    "taskId": abrakadabraUUID2,
+    "type": "ONCE",
+    "notify_at": "2026-07-10T10:26:30+04:00",
+    "period": null,
+    "is_active": true
+}
+```
+**Примечание**: проверять что notify_at >= now(), а также если type=PERIOD, то period != null
+
+- выключать уведомления
+```http request
+DELETE /api/v1/notifications/{tg-id}/{id}
+```
+**Примечание**: уведомления можно просто отключить не удаляя из бд
+```http request
+
+PUT /api/v1/notifications
+
+{
+    "id": "abracadabraUUID",
+    "isActive": true
+}
+
+retunrs
+{
+    "id": "abrakadabraUUID",
+    "ownerId": 20,
+    "title": "notify me"
+    "taskId": abrakadabraUUID2,
+    "type": "ONCE",
+    "notify_at": "2026-07-10T10:26:30+04:00",
+    "period": null,
+    "is_active": true
+}
+```
+
+- добавить документ
+```http request
+POST /api/v1/documents/{tg-id}
+
+{
+    "content": "heheh"
+}
+
+returns
+{
+    "id": "abrakadabraUUID",
+    "ownerId": 20,
+    "content": "hehe",
+    "created_at": "2026-07-10T10:26:30+04:00"
+}
+```
+
+- удалить документ
+```http request
+DELETE /api/v1/document/{tg-id}/{id}
+
+returns
+{
+    "id": "abrakadabraUUID",
+    "ownerId": 20,
+    "content": "hehe",
+    "created_at": "2026-07-10T10:26:30+04:00"
+}
+```
+- создать новый контакт
+```http request
+POST /api/v1/contacts/{tg-id}
+
+{
+    "name": "xLudwing",
+    "phoneNumber": "+79000009090",
+    "email": "example@mail.com",
+    "company": "ITIS Migrants Group",
+    "note": "friend"
+}
+
+returns
+{
+    "id": "abrakadabraUUID",
+    "ownerId": 20,
+    "name": "xLudwing",
+    "phoneNumber": "+79000009090",
+    "email": "example@mail.com",
+    "company": "ITIS Migrants Group",
+    "note": "friend"
+}
+```
+
+- изменить контакт
+```http request
+PUT /api/v1/contacts/{tg-id}/
+
+{
+    "id": "abrakadabraUUID",
+    "name": "xLudwing",
+    "phoneNumber": "+79000009090",
+    "email": "example@mail.com",
+    "company": "ITIS Migrants Group",
+    "note": "friend"
+}
+
+returns
+{
+    "id": "abrakadabraUUID",
+    "ownerId": 20,
+    "name": "xLudwing",
+    "phoneNumber": "+79000009090",
+    "email": "example@mail.com",
+    "company": "ITIS Migrants Group",
+    "note": "friend"
+}
+```
+- удалить контакт
+```http request
+DELETE /api/v1/contacts/{tg-id}/{id}
+
+returns NO_CONTENT
+```
+
+- поиск по контактам, таскам и документам
+```http request
+GET /api/v1/search/query={}
+
+returns
+
+{
+    "items": [
+    {
+        "type": {"CONTACT/DOCUMENT/TASK"},
+        "id": "abracadabraUUID",
+        "title": {имя контакта, контент документа, тайтл задачи}
+    },
+    {
+        "type": {"CONTACT/DOCUMENT/TASK"},
+        "id": "abracadabraUUID2",
+        "title": {имя контакта, контент документа, тайтл задачи}
+    }
+    ],
+    "size": 2 (количество найденых сущностей)
+}
+```
+**Примечание**: нужно использовать /search микросервисов
 ### User Service
 Управление пользователями системы.
 
@@ -127,14 +333,10 @@ account
     username: string
 }
 ```
-### Endpoints
+#### Endpoints
 ```http request
-GET /users
+GET /users/{tg-id}
 
-{
-    "tgId": 20,
-    "username": "test"
-}
 
 returns
 {
@@ -144,6 +346,11 @@ returns
 ```
 ```http request
 POST /users/{tg-id}
+
+{
+    "tgId": 20,
+    "username": "test"
+}
 
 returns
 {
@@ -189,8 +396,7 @@ returns
     "id": "abracadabraUUID",
     "userId": 20,
     "title": "task #1",
-    "at_created": "2026-07-10T10:26:30+04:00",
-    "at_ended": "2026-07-15T12:00:00+04:00",
+    "deadline": "2026-07-15T12:00:00+04:00",
     "status": "NEW"
 }
 ]
@@ -204,8 +410,7 @@ returns
     "id": "abracadabraUUID",
     "userId": 20,
     "title": "task #1",
-    "at_created": "2026-07-10T10:26:30+04:00",
-    "at_ended": "2026-07-15T12:00:00+04:00",
+    "deadline": "2026-07-10T10:26:30+04:00",
     "status": "NEW"
 }
 ]
@@ -223,8 +428,7 @@ returns
     "id": "abracadabraUUID",
     "userId": 20,
     "title": "task #1",
-    "at_created": "2026-07-10T10:26:30+04:00",
-    "at_ended": "2026-07-15T12:00:00+04:00",
+    "deadline": "2026-07-10T10:26:30+04:00",
     "status": "NEW"
 }
 ```
@@ -240,8 +444,7 @@ returns
     "id": "abracadabraUUID",
     "userId": 20,
     "title": "task #1",
-    "created_at": "2026-07-10T10:26:30+04:00",
-    "ended_at": "2026-07-15T12:00:00+04:00",
+    "deadline": "2026-07-10T10:26:30+04:00",
     "status": "COMPLETED"
 }
 ```
@@ -253,8 +456,7 @@ returns
     "id": "abracadabraUUID",
     "userId": 20,
     "title": "task #1",
-    "created_at": "2026-07-10T10:26:30+04:00",
-    "ended_at": "2026-07-15T12:00:00+04:00",
+    "deadline": "2026-07-10T10:26:30+04:00",
     "status": "COMPLETED"
 }
 ```
@@ -277,7 +479,7 @@ contact
 ```
 #### Endpoints
 ```http request
-GET /contacts
+GET /contacts/{tg-id}
 
 returns
 [
@@ -293,7 +495,7 @@ returns
 ]
 ```
 ```http request
-GET /contacts/search?query={}
+GET /contacts/{tg-id}/search?query={}
 
 returns
 [
@@ -307,6 +509,68 @@ returns
     "note": "friend"
 }
 ]
+```
+
+```http request
+POST /contacts/{tg-id}
+
+{
+    "name": "xLudwing",
+    "phoneNumber": "+79000009090",
+    "email": "example@mail.com",
+    "company": "ITIS Migrants Group",
+    "note": "friend"
+}
+
+returns
+{
+    "id": "abrakadabraUUID",
+    "ownerId": 20,
+    "name": "xLudwing",
+    "phoneNumber": "+79000009090",
+    "email": "example@mail.com",
+    "company": "ITIS Migrants Group",
+    "note": "friend"
+}
+```
+
+```http request
+PUT /contacts/{tg-id}/
+
+{
+    "id": "abrakadabraUUID",
+    "name": "xLudwing",
+    "phoneNumber": "+79000009090",
+    "email": "example@mail.com",
+    "company": "ITIS Migrants Group",
+    "note": "friend"
+}
+
+returns
+{
+    "id": "abrakadabraUUID",
+    "ownerId": 20,
+    "name": "xLudwing",
+    "phoneNumber": "+79000009090",
+    "email": "example@mail.com",
+    "company": "ITIS Migrants Group",
+    "note": "friend"
+}
+```
+
+```http request
+DELETE /contacts/{tg-id}/{id}
+
+returns
+{
+    "id": "abrakadabraUUID",
+    "ownerId": 20,
+    "name": "xLudwing",
+    "phoneNumber": "+79000009090",
+    "email": "example@mail.com",
+    "company": "ITIS Migrants Group",
+    "note": "friend"
+}
 ```
 ### Documentation Service
 Хранение и поиск документов и информации.
@@ -385,21 +649,6 @@ notification_type {
 ```
 #### Endpoint
 ```http request
-GET /notifications/{tg-id}/search?query={}
-
-retunrs
-{
-    "id": "abrakadabraUUID",
-    "ownerId": 20,
-    "title": "notify me"
-    "taskId": "abrakadabraUUID2",
-    "type": "ONCE",
-    "notify_at": "2026-07-10T10:26:30+04:00",
-    "period": null,
-    "is_active": true
-}
-```
-```http request
 POST /notifications/{tg-id}
 
 {
@@ -408,6 +657,28 @@ POST /notifications/{tg-id}
     "type": "ONCE",
     "notify_at": "2026-07-10T10:26:30+04:00",
     "period": null
+}
+
+retunrs
+{
+    "id": "abrakadabraUUID",
+    "ownerId": 20,
+    "title": "notify me"
+    "taskId": abrakadabraUUID2,
+    "type": "ONCE",
+    "notify_at": "2026-07-10T10:26:30+04:00",
+    "period": null,
+    "is_active": true
+}
+```
+
+```http request
+
+PUT /notifications
+
+{
+    "id": "abracadabraUUID",
+    "isActive": true
 }
 
 retunrs
