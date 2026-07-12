@@ -36,9 +36,9 @@ public interface UserApi {
             @ApiResponse(responseCode = "200", description = "Пользователь найден", content = @Content(schema = @Schema(implementation = UserResponse.class))),
             @ApiResponse(responseCode = "404", description = "Пользователь не найден")
     })
-    @GetMapping("/{tgId}")
+    @GetMapping("/{tg-id}")
     @ResponseStatus(HttpStatus.OK)
-    UserResponse getById(@PathVariable Long tgId);
+    UserResponse getById(@PathVariable("tg-id") Long tgId);
 
     @Operation(summary = "Удаление пользователя (только для администратора) по ID",
             operationId = "user-delete")
@@ -47,7 +47,7 @@ public interface UserApi {
             @ApiResponse(responseCode = "403", description = "Доступ запрещен"),
             @ApiResponse(responseCode = "404", description = "Пользователь не найден")
     })
-    @DeleteMapping("/{tgId}")
+    @DeleteMapping("/{tg-id}")
     @ResponseStatus(HttpStatus.OK)
-    UserResponse deleteById(@PathVariable Long tgId);
+    UserResponse deleteById(@PathVariable("tg-id") Long tgId);
 }
