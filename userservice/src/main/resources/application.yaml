@@ -17,7 +17,7 @@ starter:
   logging:
     enabled: true
     pointcuts:
-      - "execution(* ru.itis.migrants.userservice.service.*.*(..))"
+      - "execution(s* ru.itis.migrants.userservice.service.*.*(..))"
       - "execution(* ru.itis.migrants.userservice.controller.*.*(..))"
     file:
       directory: logs
