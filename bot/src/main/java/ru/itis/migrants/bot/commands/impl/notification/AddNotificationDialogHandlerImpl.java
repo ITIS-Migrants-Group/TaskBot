@@ -40,7 +40,15 @@ public class AddNotificationDialogHandlerImpl implements DialogHandler {
             return true;
         }
 
-        return userStateService.isInDialog(chatId) && (!text.startsWith("/") || text.equals("/cancel"));
+        if (text.equals("/cancel")) {
+            return userStateService.isInDialog(chatId);
+        }
+
+        DialogState state = userStateService.getState(chatId);
+        return state == DialogState.AWAITING_NOTIFICATION_TITLE ||
+                state == DialogState.AWAITING_NOTIFICATION_TYPE ||
+                state == DialogState.AWAITING_NOTIFICATION_DATETIME ||
+                state == DialogState.AWAITING_NOTIFICATION_INTERVAL;
     }
 
     @Override
@@ -82,7 +90,7 @@ public class AddNotificationDialogHandlerImpl implements DialogHandler {
                 }
                 data.setType(type);
                 userStateService.setState(chatId, DialogState.AWAITING_NOTIFICATION_DATETIME);
-                sendMessage(chatId, "Введите дату и время в формате ISO 8601 (например, 2026-07-15T12:00:00+04:00):");
+                sendMessage(chatId, "Введите вермя дедлайна в формате ISO 8601 (например, 2026-07-15T12:00:00+04:00):");
                 break;
 
             case AWAITING_NOTIFICATION_DATETIME:
@@ -92,7 +100,7 @@ public class AddNotificationDialogHandlerImpl implements DialogHandler {
                         sendMessage(chatId, "Дата должна быть в будущем. Попробуйте снова:");
                         return;
                     }
-                    data.setNotifyAt(text);
+                    data.setNotifyAt(notifyAt);
                     if (data.getType().equals("PERIOD")) {
                         userStateService.setState(chatId, DialogState.AWAITING_NOTIFICATION_INTERVAL);
                         sendMessage(chatId, "Введите период в формате ISO 8601 (например, PT1H для каждого часа):");
@@ -106,7 +114,7 @@ public class AddNotificationDialogHandlerImpl implements DialogHandler {
 
             case AWAITING_NOTIFICATION_INTERVAL:
                 try {
-                    java.time.Duration.parse(text); // проверяем парсинг
+                    java.time.Duration.parse(text);
                     data.setPeriod(text);
                     createNotification(chatId, data);
                 } catch (DateTimeParseException e) {
@@ -127,12 +135,12 @@ public class AddNotificationDialogHandlerImpl implements DialogHandler {
                 request.setTitle(data.getTitle());
             }
             request.setType(CreateNotificationRequest.TypeEnum.valueOf(data.getType()));
-            request.setNotifyAt(OffsetDateTime.parse(data.getNotifyAt()));
+            request.setNotifyAt(data.getNotifyAt());
             if (data.getPeriod() != null) {
                 request.setPeriod(data.getPeriod());
             }
-
-            Notification notification = defaultApi.createNotification(Math.toIntExact(chatId), request);
+            log.debug("отпарвка уведомления: {}", request);
+            Notification notification = defaultApi.createNotification(chatId, request);
 
             StringBuilder response = new StringBuilder("✅ Уведомление создано!\n");
             response.append("Заголовок: ").append(notification.getTitle()).append("\n");

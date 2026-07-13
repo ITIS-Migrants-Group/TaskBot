@@ -4,12 +4,15 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.itis.migrants.bot.api.DefaultApi;
 import ru.itis.migrants.bot.commands.impl.AbstractCommandHandler;
 import ru.itis.migrants.bot.model.CreateUserRequest;
+import ru.itis.migrants.bot.model.User;
 import ru.itis.migrants.bot.models.enums.CommandType;
 
+@Slf4j
 @Component
 public class StartCommandHandler extends AbstractCommandHandler {
 
@@ -43,9 +46,12 @@ public class StartCommandHandler extends AbstractCommandHandler {
         Long chatId = message.chat().id();
         CommandType commandType = CommandType.START;
         setLogForRespondingToUser(chatId, text, commandType.getType());
+        log.debug("Отправка в AG данные по команде /start");
         defaultApi.registerUser(new CreateUserRequest()
-                .tgId(Math.toIntExact(chatId))
+                .tgId(chatId)
                 .username(message.chat().username())
         );
+
+        sendMessageToUser(chatId, "Регистрация прошла успешно", "/start");
     }
 }

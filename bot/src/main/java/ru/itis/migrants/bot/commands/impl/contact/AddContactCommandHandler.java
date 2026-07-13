@@ -38,11 +38,16 @@ public class AddContactCommandHandler implements DialogHandler {
             return true;
         }
 
-        if (userStateService.isInDialog(chatId) && (!text.startsWith("/") || text.equals("/cancel"))) {
-            return true;
+        if (text.equals("/cancel")) {
+            return userStateService.isInDialog(chatId);
         }
 
-        return false;
+        DialogState state = userStateService.getState(chatId);
+        return state == DialogState.AWAITING_CONTACT_NAME ||
+                state == DialogState.AWAITING_PHONE ||
+                state == DialogState.AWAITING_COMPANY ||
+                state == DialogState.AWAITING_EMAIL ||
+                state == DialogState.AWAITING_NOTE;
     }
 
     @Override
@@ -123,8 +128,8 @@ public class AddContactCommandHandler implements DialogHandler {
             request.setEmail(data.getEmail());
             request.setCompany(data.getCompany());
             request.setNote(data.getNote());
-
-            Contact contact = defaultApi.createContact(Math.toIntExact(chatId), request);
+            log.debug("Создание контакта: {}", request);
+            Contact contact = defaultApi.createContact(chatId, request);
 
             StringBuilder response = new StringBuilder("✅ Контакт успешно создан!\n");
             response.append("Имя: ").append(contact.getName()).append("\n");
