@@ -1,0 +1,552 @@
+openapi: 3.0.3
+info:
+  title: API Gateway
+  description: Точка входа для клиента. Управление пользователями, задачами, уведомлениями, документами и контактами.
+  version: 1.0.0
+servers:
+  - url: /api/v1
+paths:
+  # Пользователи
+  /api/v1/users/{tg-id}:
+    get:
+      summary: Получить пользователя
+      operationId: getUser
+      parameters:
+        - name: tg-id
+          in: path
+          required: true
+          schema:
+            format: int64
+      responses:
+        '200':
+          description: Данные пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /api/v1/users:
+    post:
+      summary: Зарегистрировать пользователя
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: Пользователь зарегистрирован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  # Задачи
+  /api/v1/tasks/{tg-id}:
+    get:
+      summary: Список задач пользователя с фильтрами
+      operationId: getTasks
+      parameters:
+        - name: tg-id
+          in: path
+          required: true
+          schema:
+            format: int64
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [NEW, COMPLETED]
+        - name: ended_at
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Список задач
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+    post:
+      summary: Создать новую задачу
+      operationId: createTask
+      parameters:
+        - name: tg-id
+          in: path
+          required: true
+          schema:
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+      responses:
+        '201':
+          description: Задача создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Ошибка валидации (deadline < now)
+  /api/v1/tasks/{tg-id}/{task-id}:
+    put:
+      summary: Изменить статус задачи
+      operationId: updateTaskStatus
+      parameters:
+        - name: tg-id
+          in: path
+          required: true
+          schema:
+            format: int64
+        - name: task-id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskStatusRequest'
+      responses:
+        '200':
+          description: Статус задачи обновлён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+  /api/v1/tasks/{tg-id}/{id}:
+    delete:
+      summary: Удалить задачу
+      operationId: deleteTask
+      parameters:
+        - name: tg-id
+          in: path
+          required: true
+          schema:
+            format: int64
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Задача удалена
+  # Уведомления
+  /api/v1/notifications/{tg-id}:
+    post:
+      summary: Добавить новое уведомление
+      operationId: createNotification
+      parameters:
+        - name: tg-id
+          in: path
+          required: true
+          schema:
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNotificationRequest'
+      responses:
+        '201':
+          description: Уведомление создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+        '400':
+          description: Ошибка валидации (notify_at < now, или type=PERIOD но period=null)
+  /api/v1/notifications:
+    put:
+      summary: Включить/выключить уведомление (без удаления)
+      operationId: toggleNotification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ToggleNotificationRequest'
+      responses:
+        '200':
+          description: Статус активности изменён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+  /api/v1/notifications/{tg-id}/{id}:
+    delete:
+      summary: Удалить уведомление
+      operationId: deleteNotification
+      parameters:
+        - name: tg-id
+          in: path
+          required: true
+          schema:
+            format: int64
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Уведомление удалено
+
+  # Документы
+  /api/v1/documents/{tg-id}:
+    post:
+      summary: Добавить документ
+      operationId: createDocument
+      parameters:
+        - name: tg-id
+          in: path
+          required: true
+          schema:
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDocumentRequest'
+      responses:
+        '201':
+          description: Документ создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+  /api/v1/documents/{tg-id}/{id}:
+    delete:
+      summary: Удалить документ
+      operationId: deleteDocument
+      parameters:
+        - name: tg-id
+          in: path
+          required: true
+          schema:
+            format: int64
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Удалённый документ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+  # Контакты
+  /api/v1/contacts/{tg-id}:
+    post:
+      summary: Создать новый контакт
+      operationId: createContact
+      parameters:
+        - name: tg-id
+          in: path
+          required: true
+          schema:
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateContactRequest'
+      responses:
+        '201':
+          description: Контакт создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+    put:
+      summary: Изменить контакт
+      operationId: updateContact
+      parameters:
+        - name: tg-id
+          in: path
+          required: true
+          schema:
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateContactRequest'
+      responses:
+        '200':
+          description: Контакт обновлён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+  /api/v1/contacts/{tg-id}/{id}:
+    delete:
+      summary: Удалить контакт
+      operationId: deleteContact
+      parameters:
+        - name: tg-id
+          in: path
+          required: true
+          schema:
+            format: int64
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Контакт удалён
+  # Поиск
+  /api/v1/search:
+    get:
+      summary: Поиск по контактам, задачам и документам
+      operationId: search
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Результаты поиска
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        tgId:
+          format: int64
+        username:
+          type: string
+    CreateUserRequest:
+      type: object
+      required:
+        - tgId
+        - username
+      properties:
+        tgId:
+          format: int64
+        username:
+          type: string
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          format: int64
+        title:
+          type: string
+        at_created:
+          type: string
+          format: date-time
+        at_ended:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [NEW, COMPLETED]
+    CreateTaskRequest:
+      type: object
+      required:
+        - title
+        - deadline
+      properties:
+        title:
+          type: string
+        deadline:
+          type: string
+          format: date-time
+        notify_for:
+          type: string
+          description: ISO 8601 duration, например PT30M
+          example: PT30M
+    UpdateTaskStatusRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [COMPLETED]
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        ownerId:
+          type: integer
+          format: int64
+        title:
+          type: string
+        taskId:
+          type: string
+          format: uuid
+          nullable: true
+        type:
+          type: string
+          enum: [ONCE, PERIOD]
+        notify_at:
+          type: string
+          format: date-time
+        period:
+          type: string
+          nullable: true
+          description: ISO 8601 duration, требуется при type=PERIOD
+        is_active:
+          type: boolean
+    CreateNotificationRequest:
+      type: object
+      required:
+        - type
+        - notify_at
+      properties:
+        title:
+          type: string
+          default: "Задача: <название>"
+        taskId:
+          type: string
+          format: uuid
+          description: ID задачи, если уведомление привязано к задаче
+        type:
+          type: string
+          enum: [ONCE, PERIOD]
+        notify_at:
+          type: string
+          format: date-time
+        period:
+          type: string
+          nullable: true
+          description: Обязательно при type=PERIOD
+    ToggleNotificationRequest:
+      type: object
+      required:
+        - id
+        - isActive
+      properties:
+        id:
+          type: string
+          format: uuid
+        isActive:
+          type: boolean
+    Document:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        ownerId:
+          type: integer
+          format: int64
+        content:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    CreateDocumentRequest:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+    Contact:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        ownerId:
+          type: integer
+          format: int64
+        name:
+          type: string
+        phoneNumber:
+          type: string
+        email:
+          type: string
+          format: email
+        company:
+          type: string
+        note:
+          type: string
+    CreateContactRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        phoneNumber:
+          type: string
+        email:
+          type: string
+          format: email
+        company:
+          type: string
+        note:
+          type: string
+    UpdateContactRequest:
+      allOf:
+        - $ref: '#/components/schemas/CreateContactRequest'
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: string
+              format: uuid
+    SearchItem:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [ CONTACT, DOCUMENT, TASK ]
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          description: Имя контакта / контент документа / заголовок задачи
+    SearchResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchItem'
+        size:
+          type: integer
+          description: Количество найденных сущностей

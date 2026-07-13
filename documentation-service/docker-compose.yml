@@ -1,0 +1,34 @@
+services:
+  documentation-db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: documentation_service_db
+      POSTGRES_USER: ${DATABASE_USER:-taskbot}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-taskbot}
+    volumes:
+      - documentation_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  documentation-service:
+    build:
+      context: ..
+      dockerfile: documentation-service/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      documentation-db:
+        condition: service_healthy
+    ports:
+      - "${DOCUMENTATION_SERVICE_PORT:-8092}:${DOCUMENTATION_SERVICE_PORT:-8092}"
+    environment:
+      DOCUMENTATION_SERVICE_PORT: ${DOCUMENTATION_SERVICE_PORT:-8092}
+      DOCUMENTATION_SERVICE_DB_URL: jdbc:postgresql://documentation-db:5432/documentation_service_db
+      DATABASE_USER: ${DATABASE_USER:-taskbot}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-taskbot}
+
+volumes:
+  documentation_db_data:

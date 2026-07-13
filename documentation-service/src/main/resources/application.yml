@@ -1,0 +1,23 @@
+server:
+  port: ${DOCUMENTATION_SERVICE_PORT:8092}
+
+spring:
+  application:
+    name: documentation-service
+  config:
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:../.env[.properties]
+
+  datasource:
+    url: ${DOCUMENTATION_SERVICE_DB_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml

@@ -1,0 +1,34 @@
+server:
+  port: 8094
+
+spring:
+  application:
+    name: ContactService
+  config:
+    import: optional:file:.env[.properties]
+
+
+  datasource:
+    url: ${CONTACT_SERVICE_DB_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
+  liquibase:
+    url: ${CONTACT_SERVICE_DB_URL}
+    user: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+      hibernate.format_sql: true
+
+starter:
+  logging:
+    enabled: true
+    file:
+      enabled: true
+logging:
+  level:
+    ru.itis.migrants: DEBUG
