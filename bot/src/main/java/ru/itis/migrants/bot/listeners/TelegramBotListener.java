@@ -29,9 +29,7 @@ public class TelegramBotListener implements UpdatesListener {
     public int process(List<Update> list) {
         for (Update update : list) {
             try {
-                if (update.message() != null) {
-                    dispatcher.dispatch(update);
-                }
+                dispatcher.dispatch(update);
             } catch (Exception e) {
                 log.error("Ошибка в процессе обработки update: {}", update, e);
             }

@@ -6,6 +6,7 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.itis.migrants.bot.api.DefaultApi;
 import ru.itis.migrants.bot.commands.impl.AbstractCommandHandler;
@@ -15,6 +16,7 @@ import ru.itis.migrants.bot.models.enums.CommandType;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+@Slf4j
 @Component
 public class GetListTasksCommandHandler extends AbstractCommandHandler {
 
@@ -50,22 +52,22 @@ public class GetListTasksCommandHandler extends AbstractCommandHandler {
         Long chatId = message.chat().id();
         CommandType commandType = CommandType.TASKS;
         setLogForRespondingToUser(chatId, text, commandType.getType());
-
+        log.debug("Сообщение от пользователя: {}", text);
         String[] arg = text.split(" ");
         List<Task> tasks;
         try {
             if (arg.length == 2) {
                 if (containsNumber(arg[1])) {
                     OffsetDateTime deadline = OffsetDateTime.parse(arg[1]);
-                    tasks = gatewayApi.getTasks(Math.toIntExact(chatId), null, deadline);
+                    tasks = gatewayApi.getTasks(chatId, null, deadline);
                 } else {
-                    tasks = gatewayApi.getTasks(Math.toIntExact(chatId), arg[1], null);
+                    tasks = gatewayApi.getTasks(chatId, arg[1], null);
                 }
             } else if (arg.length == 3) {
                 OffsetDateTime deadline = OffsetDateTime.parse(arg[2]);
-                tasks = gatewayApi.getTasks(Math.toIntExact(chatId), arg[1], deadline);
+                tasks = gatewayApi.getTasks(chatId, arg[1], deadline);
             } else {
-                tasks = gatewayApi.getTasks(Math.toIntExact(chatId), null, null);
+                tasks = gatewayApi.getTasks(chatId, null, null);
             }
             sendTaskList(chatId, tasks);
         } catch (Exception e) {

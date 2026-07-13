@@ -37,7 +37,7 @@ public class DeleteTaskCallbackHandler implements CallbackHandler {
         String uuidStr = data.substring("delete_task_".length());
         try {
             UUID taskId = UUID.fromString(uuidStr);
-            gatewayApi.deleteTask(Math.toIntExact(chatId), taskId);
+            gatewayApi.deleteTask(chatId, taskId);
 
             telegramBot.execute(new AnswerCallbackQuery(callbackQuery.id())
                     .text("✅ Задача удалена!")

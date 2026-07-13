@@ -63,7 +63,10 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -99,7 +102,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/openapi/bot-api.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/openapi/gateway-api.yaml</inputSpec>
                             <generatorName>java</generatorName>
                             <output>${project.build.directory}/generated-sources/openapi/bot</output>
                             <apiPackage>ru.itis.migrants.bot.api</apiPackage>
@@ -113,6 +116,7 @@
                                 <library>resttemplate</library>
                                 <useJakartaEe>true</useJakartaEe>
                                 <dateLibrary>java8</dateLibrary>
+                                <openApiNullable>false</openApiNullable>
                             </configOptions>
                         </configuration>
                     </execution>

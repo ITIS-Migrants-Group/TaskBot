@@ -7,7 +7,7 @@ servers:
   - url: /api/v1
 paths:
   # Пользователи
-  /users/{tg-id}:
+  /api/v1/users/{tg-id}:
     get:
       summary: Получить пользователя
       operationId: getUser
@@ -16,7 +16,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            format: int64
       responses:
         '200':
           description: Данные пользователя
@@ -24,7 +24,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-  /users:
+  /api/v1/users:
     post:
       summary: Зарегистрировать пользователя
       operationId: registerUser
@@ -43,7 +43,7 @@ paths:
                 $ref: '#/components/schemas/User'
 
   # Задачи
-  /tasks/{tg-id}:
+  /api/v1/tasks/{tg-id}:
     get:
       summary: Список задач пользователя с фильтрами
       operationId: getTasks
@@ -52,7 +52,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            format: int64
         - name: status
           in: query
           required: false
@@ -82,7 +82,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            format: int64
       requestBody:
         required: true
         content:
@@ -98,7 +98,7 @@ paths:
                 $ref: '#/components/schemas/Task'
         '400':
           description: Ошибка валидации (deadline < now)
-  /tasks/{tg-id}/{task-id}:
+  /api/v1/tasks/{tg-id}/{task-id}:
     put:
       summary: Изменить статус задачи
       operationId: updateTaskStatus
@@ -107,7 +107,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            format: int64
         - name: task-id
           in: path
           required: true
@@ -127,7 +127,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Task'
-  /tasks/{tg-id}/{id}:
+  /api/v1/tasks/{tg-id}/{id}:
     delete:
       summary: Удалить задачу
       operationId: deleteTask
@@ -136,7 +136,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            format: int64
         - name: id
           in: path
           required: true
@@ -147,7 +147,7 @@ paths:
         '204':
           description: Задача удалена
   # Уведомления
-  /notifications/{tg-id}:
+  /api/v1/notifications/{tg-id}:
     post:
       summary: Добавить новое уведомление
       operationId: createNotification
@@ -156,7 +156,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            format: int64
       requestBody:
         required: true
         content:
@@ -172,7 +172,7 @@ paths:
                 $ref: '#/components/schemas/Notification'
         '400':
           description: Ошибка валидации (notify_at < now, или type=PERIOD но period=null)
-  /notifications:
+  /api/v1/notifications:
     put:
       summary: Включить/выключить уведомление (без удаления)
       operationId: toggleNotification
@@ -189,7 +189,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Notification'
-  /notifications/{tg-id}/{id}:
+  /api/v1/notifications/{tg-id}/{id}:
     delete:
       summary: Удалить уведомление
       operationId: deleteNotification
@@ -198,7 +198,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            format: int64
         - name: id
           in: path
           required: true
@@ -210,7 +210,7 @@ paths:
           description: Уведомление удалено
 
   # Документы
-  /documents/{tg-id}:
+  /api/v1/documents/{tg-id}:
     post:
       summary: Добавить документ
       operationId: createDocument
@@ -219,7 +219,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            format: int64
       requestBody:
         required: true
         content:
@@ -233,7 +233,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Document'
-  /documents/{tg-id}/{id}:
+  /api/v1/documents/{tg-id}/{id}:
     delete:
       summary: Удалить документ
       operationId: deleteDocument
@@ -242,7 +242,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            format: int64
         - name: id
           in: path
           required: true
@@ -257,7 +257,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Document'
   # Контакты
-  /contacts/{tg-id}:
+  /api/v1/contacts/{tg-id}:
     post:
       summary: Создать новый контакт
       operationId: createContact
@@ -266,7 +266,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            format: int64
       requestBody:
         required: true
         content:
@@ -288,7 +288,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            format: int64
       requestBody:
         required: true
         content:
@@ -302,7 +302,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Contact'
-  /contacts/{tg-id}/{id}:
+  /api/v1/contacts/{tg-id}/{id}:
     delete:
       summary: Удалить контакт
       operationId: deleteContact
@@ -311,7 +311,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            format: int64
         - name: id
           in: path
           required: true
@@ -322,7 +322,7 @@ paths:
         '204':
           description: Контакт удалён
   # Поиск
-  /search:
+  /api/v1/search:
     get:
       summary: Поиск по контактам, задачам и документам
       operationId: search
@@ -345,7 +345,7 @@ components:
       type: object
       properties:
         tgId:
-          type: integer
+          format: int64
         username:
           type: string
     CreateUserRequest:
@@ -355,7 +355,7 @@ components:
         - username
       properties:
         tgId:
-          type: integer
+          format: int64
         username:
           type: string
     Task:
@@ -365,7 +365,7 @@ components:
           type: string
           format: uuid
         userId:
-          type: integer
+          format: int64
         title:
           type: string
         at_created:
@@ -408,6 +408,7 @@ components:
           format: uuid
         ownerId:
           type: integer
+          format: int64
         title:
           type: string
         taskId:
@@ -468,6 +469,7 @@ components:
           format: uuid
         ownerId:
           type: integer
+          format: int64
         content:
           type: string
         created_at:
@@ -488,6 +490,7 @@ components:
           format: uuid
         ownerId:
           type: integer
+          format: int64
         name:
           type: string
         phoneNumber:
