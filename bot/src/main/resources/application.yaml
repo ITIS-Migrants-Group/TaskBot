@@ -5,12 +5,29 @@ spring:
   application:
     name: bot
 
+  config:
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:../.env[.properties]
+
+  rabbitmq:
+    host: ${RABBIT_MQ_HOST:localhost}
+    port: ${RABBIT_MQ_PORT:5672}
+    username: ${RABBIT_MQ_USER}
+    password: ${RABBIT_MQ_PASSWORD}
+
+
 clients:
   gateway:
     base-url: http://localhost:8080
     connect-timeout: 5s
     read-timeout: 10s
 
+property:
+  rabbitmq:
+    queue: notification.push.queue
+    exchange: notification.topic.exchange
+    push-key: notification.push.*
 
 app:
   telegram:
