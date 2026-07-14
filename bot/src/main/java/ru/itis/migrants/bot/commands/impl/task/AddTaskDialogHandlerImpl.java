@@ -10,16 +10,20 @@ import com.pengrad.telegrambot.request.SendMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.itis.migrants.bot.api.DefaultApi;
+import ru.itis.migrants.bot.client.GatewayClient;
 import ru.itis.migrants.bot.commands.DialogHandler;
-import ru.itis.migrants.bot.model.CreateTaskRequest;
-import ru.itis.migrants.bot.model.Task;
+import ru.itis.migrants.bot.dto.request.CreateTaskRequest;
+import ru.itis.migrants.bot.dto.response.TaskResponse;
 import ru.itis.migrants.bot.models.TaskDialogData;
+import ru.itis.migrants.bot.models.enums.CommandType;
 import ru.itis.migrants.bot.models.enums.DialogState;
 import ru.itis.migrants.bot.models.enums.NotifyPeriod;
 import ru.itis.migrants.bot.services.UserStateService;
+import ru.itis.migrants.bot.utils.DateTimeParser;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +35,8 @@ public class AddTaskDialogHandlerImpl implements DialogHandler {
 
     private final TelegramBot telegramBot;
     private final UserStateService userStateService;
-    private final DefaultApi gatewayClient;
+    private final GatewayClient gatewayClient;
+    private final DateTimeParser dateTimeParser;
 
     @Override
     public boolean supports(Update update) {
@@ -50,7 +55,7 @@ public class AddTaskDialogHandlerImpl implements DialogHandler {
         if (text == null) return false;
         Long chatId = message.chat().id();
 
-        if (text.equals("/addtask")) {
+        if (text.equals(CommandType.ADDTASK.getType()) || text.equals(CommandType.ADDTASK.getButtonText())) {
             return true;
         }
         if (text.equals("/cancel")) {
@@ -85,7 +90,7 @@ public class AddTaskDialogHandlerImpl implements DialogHandler {
         Long chatId = message.chat().id();
         String text = message.text();
 
-        if (text.equals("/addtask")) {
+        if (text.equals(CommandType.ADDTASK.getType()) || text.equals(CommandType.ADDTASK.getButtonText())) {
             userStateService.clearTaskDialog(chatId);
             userStateService.clearState(chatId);
             TaskDialogData data = userStateService.getTaskDialog(chatId);
@@ -110,22 +115,23 @@ public class AddTaskDialogHandlerImpl implements DialogHandler {
                 data.setTitle(text);
                 data.setState(DialogState.AWAITING_DEADLINE);
                 userStateService.setState(chatId, DialogState.AWAITING_DEADLINE);
-                sendMessage(chatId, "Введите дедлайн в формате ISO 8601 (например, 2026-07-15T12:00:00+04:00):");
+                sendMessage(chatId, "Введите время дедлайна в формате dd:MM:yyyy HH:mm (например 15:07:2026 12:00):");
                 break;
 
             case AWAITING_DEADLINE:
                 try {
-                    OffsetDateTime deadline = OffsetDateTime.parse(text);
+                    log.debug("Время дедлайна от пользователя: {}", text);
+                    OffsetDateTime deadline = dateTimeParser.parseUserDate(text);
                     if (deadline.isBefore(OffsetDateTime.now())) {
                         sendMessage(chatId, "Дедлайн должен быть в будущем. Попробуйте снова:");
                         return;
                     }
-                    data.setDeadline(text);
+                    data.setDeadline(deadline);
                     data.setState(DialogState.AWAITING_NOTIFY_PERIOD);
                     userStateService.setState(chatId, DialogState.AWAITING_NOTIFY_PERIOD);
                     sendPeriodSelection(chatId);
                 } catch (DateTimeParseException e) {
-                    sendMessage(chatId, "Неверный формат даты. Используйте формат ISO 8601 (например, 2026-07-15T12:00:00+04:00):");
+                    sendMessage(chatId, "Неверный формат даты. Используйте формат dd.mm.YYYY hh:mm:");
                 }
                 break;
 
@@ -163,14 +169,15 @@ public class AddTaskDialogHandlerImpl implements DialogHandler {
 
     private void createTask(Long chatId, TaskDialogData data) {
         try {
-            CreateTaskRequest request = new CreateTaskRequest()
-                    .deadline(OffsetDateTime.parse(data.getDeadline()))
-                    .title(data.getTitle())
-                    .notifyFor(data.getNotifyPeriod());
-            Task task = gatewayClient.createTask(chatId, request);
+            CreateTaskRequest request = new CreateTaskRequest(
+                    data.getTitle(),
+                    data.getDeadline(),
+                    data.getNotifyPeriod()
+            );
+            TaskResponse task = gatewayClient.createTask(chatId, request).getBody();
             sendMessage(chatId, "Задача успешно создана!\n" +
-                    "Заголовок: " + task.getTitle() + "\n" +
-                    "Дедлайн: " + request.getDeadline() + "\n" +
+                    "Заголовок: " + task.title() + "\n" +
+                    "Дедлайн: " + dateTimeParser.formatForUser(task.endedAt()) + "\n" +
                     "Напоминание установлено за " + data.getNotifyPeriod());
             userStateService.clearTaskDialog(chatId);
             userStateService.clearState(chatId);

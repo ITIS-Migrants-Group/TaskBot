@@ -3,6 +3,7 @@ package ru.itis.migrants.contactservice.controller;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import ru.itis.migrants.starter.logging.annotation.LogAround;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @LogAround
 @RestController
 @RequestMapping("/contacts")
@@ -37,6 +39,7 @@ public class ContactController {
     @PostMapping("/{tg-id}")
     public ResponseEntity<ContactResponse> createContact(@PathVariable("tg-id") Long tgId,
                                                          @RequestBody @Valid CreateContactRequest request) {
+        log.debug("{}",request);
         ContactResponse response = contactService.createContact(tgId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

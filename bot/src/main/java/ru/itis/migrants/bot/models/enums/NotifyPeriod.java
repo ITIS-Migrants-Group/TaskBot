@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public enum NotifyPeriod {
+    PT1M("PT1M", "1 минута"),
     PT15M("PT15M", "15 минут"),
     PT30M("PT30M", "30 минут"),
     PT1H("PT1H", "1 час"),

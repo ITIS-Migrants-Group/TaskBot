@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface TaskService {
 
-    TaskResponseDto create(TaskDto taskDto);
+    TaskResponseDto create(Long tgChat, TaskDto taskDto);
 
     List<TaskResponseDto> getTasks(Long tgChatId, String status, OffsetDateTime deadline);
 

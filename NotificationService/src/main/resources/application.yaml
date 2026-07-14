@@ -42,3 +42,6 @@ property:
     push-key: notification.push.*
     max-retries: 3
     retry-timeout: 1000
+logging:
+  level:
+    ru.itis.migrants.notificationservice: debug

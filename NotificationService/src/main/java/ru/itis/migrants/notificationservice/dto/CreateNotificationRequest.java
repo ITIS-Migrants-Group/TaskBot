@@ -10,8 +10,8 @@ import java.util.UUID;
 public record CreateNotificationRequest
 (
         String title,
-        Optional<UUID> taskId,
+        UUID taskId,
         NotificationType type,
         OffsetDateTime notifyAt,
-        Optional<Duration> period
+        Duration period
 ) {}

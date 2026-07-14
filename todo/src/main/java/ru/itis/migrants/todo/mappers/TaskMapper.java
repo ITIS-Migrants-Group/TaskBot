@@ -11,9 +11,9 @@ import java.time.OffsetDateTime;
 @Component
 public class TaskMapper {
 
-    public Task toEntity(TaskDto dto) {
+    public Task toEntity(Long tgChatId, TaskDto dto) {
         return Task.builder()
-                .tgChatId(dto.getTgChatId())
+                .tgChatId(tgChatId)
                 .title(dto.getTitle())
                 .createdAt(OffsetDateTime.now())
                 .endedAt(dto.getDeadline())
@@ -22,8 +22,8 @@ public class TaskMapper {
     }
 
     public TaskResponseDto toResponseDto(Task task) {
-        return new TaskResponseDto().
-                id(task.getId())
+        return new TaskResponseDto()
+                .id(task.getId())
                 .tgChatId(task.getTgChatId())
                 .title(task.getTitle())
                 .createdAt(task.getCreatedAt())

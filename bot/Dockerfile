@@ -11,10 +11,7 @@ COPY userservice/pom.xml userservice/pom.xml
 COPY ApiGateway/pom.xml ApiGateway/pom.xml
 COPY ContactService/pom.xml ContactService/pom.xml
 COPY bot/pom.xml bot/pom.xml
-
-RUN mkdir -p bot
-
-RUN mvn -B -pl bot -am dependency:go-offline
+COPY migrants-logging-spring-boot-starter/src migrants-logging-spring-boot-starter/src
 
 COPY bot/src bot/src
 RUN mvn -B -pl bot -am package -DskipTests

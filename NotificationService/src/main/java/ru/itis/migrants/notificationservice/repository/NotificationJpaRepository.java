@@ -8,6 +8,7 @@ import ru.itis.migrants.notificationservice.model.Notification;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -19,4 +20,6 @@ public interface NotificationJpaRepository extends JpaRepository<Notification, U
     AND n.notifyAt < :time
     """)
     List<Notification> findForScheduler(@Param("time") OffsetDateTime time);
+
+    Optional<Notification> findByOwnerId(Long ownerId);
 }

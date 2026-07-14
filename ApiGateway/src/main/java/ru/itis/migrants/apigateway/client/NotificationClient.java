@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.ResponseEntity;
 import ru.itis.migrants.apigateway.dto.request.CreateNotificationRequest;
+import ru.itis.migrants.apigateway.dto.request.CreateNotificationRequestDto;
 import ru.itis.migrants.apigateway.dto.request.UpdateNotificationRequest;
 import ru.itis.migrants.apigateway.dto.response.NotificationResponse;
 

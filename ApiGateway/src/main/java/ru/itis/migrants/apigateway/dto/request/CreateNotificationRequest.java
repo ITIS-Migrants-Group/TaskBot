@@ -1,5 +1,8 @@
 package ru.itis.migrants.apigateway.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nullable;
 import ru.itis.migrants.apigateway.dto.enums.NotificationType;
 
 import java.time.Duration;
@@ -10,8 +13,8 @@ import java.util.UUID;
 public record CreateNotificationRequest
         (
                 String title,
-                Optional<UUID> taskId,
+                @Nullable UUID taskId,
                 NotificationType type,
                 OffsetDateTime notifyAt,
-                Optional<Duration> period
+                @Nullable Duration period
         ) {}

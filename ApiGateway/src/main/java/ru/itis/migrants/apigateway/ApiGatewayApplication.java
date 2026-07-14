@@ -49,7 +49,7 @@ public class ApiGatewayApplication {
     public DocumentClient documentClient(WebClient webClient) {
         HttpServiceProxyFactory factory = HttpServiceProxyFactory
                 .builderFor(WebClientAdapter.create(WebClient.builder()
-                        .baseUrl("http://document-service:8092")
+                        .baseUrl("http://documentation-service:8092")
                         .build())).build();
 
         return factory.createClient(DocumentClient.class);
