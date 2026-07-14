@@ -196,8 +196,10 @@ services:
     environment:
       CLIENTS_GATEWAY_BASE_URL: http://api-gateway:8080
       TELEGRAM_TOKEN: ${TELEGRAM_TOKEN}
+      RABBIT_MQ_HOST: rabbitmq
     depends_on:
       - api-gateway
+      - rabbitmq
     volumes:
       - maven-repo:/root/.m2
 
