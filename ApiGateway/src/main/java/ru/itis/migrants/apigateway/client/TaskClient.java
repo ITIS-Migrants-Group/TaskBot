@@ -6,11 +6,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.http.ResponseEntity;
+import ru.itis.migrants.apigateway.dto.request.CreateTaskRequest;
+import ru.itis.migrants.apigateway.dto.request.GetTasksRequest;
 import ru.itis.migrants.apigateway.dto.request.UpdateTaskRequest;
 import ru.itis.migrants.apigateway.dto.response.TaskResponse;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @HttpExchange("/tasks")
@@ -19,8 +22,7 @@ public interface TaskClient {
     @PostExchange("/{tg-id}")
     ResponseEntity<TaskResponse> create(
             @PathVariable("tg-id") Long tgId,
-            String title,
-            OffsetDateTime deadline
+            @RequestBody CreateTaskRequest request
     );
 
     /**
@@ -37,8 +39,7 @@ public interface TaskClient {
     @GetExchange("/{tg-id}")
     ResponseEntity<List<TaskResponse>> getAll(
             @PathVariable("tg-id") Long tgId,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) OffsetDateTime at_ended
+            @RequestBody GetTasksRequest request
     );
 
     /**
@@ -56,9 +57,11 @@ public interface TaskClient {
     @DeleteExchange("/{task-id}/{id}")
     ResponseEntity<Void> deleteTask(
             @PathVariable("task-id") Long taskId,
-            @PathVariable Long id
+            @PathVariable UUID id
     );
-
-    @GetExchange("/search")
-    ResponseEntity<List<TaskResponse>> search(@RequestParam String query);
+    //todo: tg-id добавить
+    @GetExchange("/{tg-id}/search")
+    ResponseEntity<List<TaskResponse>> search(
+            @PathVariable("tg-id") Long tgId,
+            @RequestParam String query);
 }

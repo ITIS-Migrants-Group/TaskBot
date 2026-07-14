@@ -76,6 +76,21 @@ services:
     volumes:
       - user_db_data:/var/lib/postgresql/data
 
+  contact-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: contact_service_db
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - contact_db_data:/var/lib/postgresql/data
+
   notification-service:
     build:
       context: .
@@ -132,9 +147,65 @@ services:
       user-db:
         condition: service_healthy
 
+  contact-service:
+    build:
+      context: .
+      dockerfile: ContactService/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${CONTACT_SERVICE_PORT:-8094}:8094"
+    depends_on:
+      contact-db:
+        condition: service_healthy
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ApiGateway/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${API_GATEWAY_PORT:-8080}:8080"
+    environment:
+      MICROSERVICES_USER_SERVICE_URL: http://user-service:8090
+      MICROSERVICES_TASK_SERVICE_URL: http://todo-service:8091
+      MICROSERVICES_NOTIFICATION_SERVICE_URL: http://notification-service:8093
+      MICROSERVICES_DOCUMENT_SERVICE_URL: http://documentation-service:8092
+      MICROSERVICES_CONTACT_SERVICE_URL: http://contact-service:8094
+    depends_on:
+      - user-service
+      - todo-service
+      - notification-service
+      - documentation-service
+      - contact-service
+    volumes:
+      - maven-repo:/root/.m2
+
+  bot:
+    build:
+      context: .
+      dockerfile: bot/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${BOT_PORT:-8081}:8081"
+    environment:
+      CLIENTS_GATEWAY_BASE_URL: http://api-gateway:8080
+      TELEGRAM_TOKEN: ${TELEGRAM_TOKEN}
+    depends_on:
+      - api-gateway
+    volumes:
+      - maven-repo:/root/.m2
+
 volumes:
+  maven-repo:
   rabbitmq_data:
   notification_db_data:
   documentation_db_data:
   todo_db_data:
   user_db_data:
+  contact_db_data:

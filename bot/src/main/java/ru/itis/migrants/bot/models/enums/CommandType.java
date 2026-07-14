@@ -6,55 +6,121 @@ import lombok.ToString;
 @ToString
 @Getter
 public enum CommandType {
-    START("/start", "Регистрация пользователя"),
-    TASKS("/tasks", "Получение задач(с и без фильтров)"),
-    ADDTASK("/addtask", "Создание новой задачи"),
-    COMPLETETASK("/completetask", "Завершить задачу"),
-    CONTACTS("/contacts", "Просмотр контактов"),
-    ADDCONTACT("/addcontact", "Добавить контакт"),
-    EDITCONTACT("/editcontact", "Редактировать контакт"),
-    DELETECONTACT("/deletecontact", "Удалить контакт"),
-    SEARCHCONTACTS("/searchcontacts", "Поиск по контактам"),
-    DOCUMENTS("/documents", "Поиск документов"),
-    ADDDOCUMENT("/adddocument", "Добавить документ"),
-    DELETEDOCUMENT("/deletedocument", "Удалить документ"),
-    NOTIFICATIONS("/notifications", "Просмотр уведомлений"),
-    ADDNOTIFICATION("/addnotification", "Создать уведомление"),
-    DELETENOTIFICATION("/deletenotification", "Удалить уведомление"),
-    SEARCH("/search", "Глобальный поиск по всем данным"),
-    UNKNOWN("", "Неизвестная команда", false);
+    START(
+            "/start",
+            "Регистрация пользователя",
+            "🚀 Начать",
+            0
+    ),
+
+    TASKS(
+            "/tasks",
+            "Получение задач",
+            "📋 Мои задачи",
+            0
+    ),
+
+    ADDTASK(
+            "/addtask",
+            "Создание задачи",
+            "➕ Добавить задачу",
+            1
+    ),
+
+    ADDNOTIFICATION(
+            "/addnotification",
+            "Создание уведомления",
+            "🔔 Уведомление",
+            1
+    ),
+
+    ADDCONTACT(
+            "/addcontact",
+            "Добавить контакт",
+            "👤 Контакт",
+            2
+    ),
+
+    ADDDOCUMENT(
+            "/adddocument",
+            "Добавить документ",
+            "📄 Документ",
+            2
+    ),
+
+    SEARCH(
+            "/search",
+            "Поиск",
+            "🔎 Поиск",
+            3
+    ),
+
+    SEARCHCONTACTS(
+            "/searchcontacts",
+            "Поиск контактов",
+            "👥 Контакты",
+            3
+    ),
+
+    MENU(
+            "/menu",
+            "Показать меню команд в виде кнопок",
+            "МЕНЮ КНОПОК",
+            1
+    ),
+
+    UNKNOWN(
+            "",
+            "Неизвестная команда",
+            "",
+            -1,
+            false
+    );
+
 
     private final String type;
     private final String description;
+    private final String buttonText;
+    private final int keyboardRow;
     private final boolean enabled;
 
-    CommandType(String type, String description) {
-        this(type, description, true);
+    CommandType(
+            String type,
+            String description,
+            String buttonText,
+            int keyboardRow
+    ) {
+        this(type, description, buttonText, keyboardRow, true);
     }
 
-    CommandType(String type, String description, boolean enabled) {
+
+    CommandType(
+            String type,
+            String description,
+            String buttonText,
+            int keyboardRow,
+            boolean enabled
+    ) {
         this.type = type;
         this.description = description;
+        this.buttonText = buttonText;
+        this.keyboardRow = keyboardRow;
         this.enabled = enabled;
     }
 
+    public String getCommandTypeWithoutSlash() {
+        return type.startsWith("/")
+                ? type.substring(1)
+                : type;
+    }
     public static CommandType getCommandTypeFromString(String text) {
+        String commandPart = text.toLowerCase().split(" ")[0];
         for (CommandType type : values()) {
-            String commandPart = text.toLowerCase().split(" ")[0];
             if (type.type.equals(commandPart)) {
                 return type;
             }
         }
-
         return UNKNOWN;
-    }
-
-    public String getCommandTypeWithoutSlash() {
-        if (type.startsWith("/")) {
-            return type.substring(1).toLowerCase();
-        } else {
-            return type.toLowerCase();
-        }
     }
 
     public static String getAllCommandsForCommandHelp() {

@@ -51,11 +51,11 @@
         </dependency>
     </dependencies>
 
-    <dependency>
-        <groupId>ru.itis.migrants</groupId>
-        <artifactId>migrants-logging-spring-boot-starter</artifactId>
-        <version>1.0.0</version>
-    </dependency>
+<!--    <dependency>-->
+<!--        <groupId>ru.itis.migrants</groupId>-->
+<!--        <artifactId>migrants-logging-spring-boot-starter</artifactId>-->
+<!--        <version>1.0.0</version>-->
+<!--    </dependency>-->
 
     <build>
         <plugins>

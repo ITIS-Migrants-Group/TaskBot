@@ -1,8 +1,10 @@
 package ru.itis.migrants.notificationservice.dto;
 
+import java.util.UUID;
+
 public record UpdateNotificationRequest
 (
-        Long id,
+        UUID id,
         String title,
         String message,
         String status

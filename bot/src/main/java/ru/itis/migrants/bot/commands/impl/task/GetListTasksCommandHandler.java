@@ -8,10 +8,12 @@ import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.itis.migrants.bot.api.DefaultApi;
+import ru.itis.migrants.bot.client.GatewayClient;
 import ru.itis.migrants.bot.commands.impl.AbstractCommandHandler;
-import ru.itis.migrants.bot.model.Task;
+import ru.itis.migrants.bot.dto.request.GetTasksRequest;
+import ru.itis.migrants.bot.dto.response.TaskResponse;
 import ru.itis.migrants.bot.models.enums.CommandType;
+import ru.itis.migrants.bot.utils.DateTimeParser;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -22,12 +24,15 @@ public class GetListTasksCommandHandler extends AbstractCommandHandler {
 
     private final TelegramBot telegramBot;
 
-    private final DefaultApi gatewayApi;
+    private final GatewayClient gatewayApi;
 
-    public GetListTasksCommandHandler(TelegramBot telegramBot, TelegramBot telegramBot1, DefaultApi gatewayApi) {
+    private final DateTimeParser dateTimeParser;
+
+    public GetListTasksCommandHandler(TelegramBot telegramBot, TelegramBot telegramBot1, GatewayClient gatewayApi, DateTimeParser dateTimeParser) {
         super(telegramBot);
         this.telegramBot = telegramBot1;
         this.gatewayApi = gatewayApi;
+        this.dateTimeParser = dateTimeParser;
     }
 
     @Override
@@ -53,29 +58,41 @@ public class GetListTasksCommandHandler extends AbstractCommandHandler {
         CommandType commandType = CommandType.TASKS;
         setLogForRespondingToUser(chatId, text, commandType.getType());
         log.debug("Сообщение от пользователя: {}", text);
-        String[] arg = text.split(" ");
-        List<Task> tasks;
+        String[] arg = text.trim().split("\\s+");
+        List<TaskResponse> tasks;
         try {
-            if (arg.length == 2) {
+            if (arg.length >= 4) {
+                OffsetDateTime deadline = dateTimeParser.parseUserDate(
+                        arg[2] + " " + arg[3]
+                );
+                log.debug(
+                        "вызов метода со всеми параметрами: status={}, ended_at={}",
+                        arg[1],
+                        deadline
+                );
+                tasks = gatewayApi.getTasks(chatId, new GetTasksRequest(arg[1], deadline)).getBody();
+            } else if (arg.length == 2) {
                 if (containsNumber(arg[1])) {
-                    OffsetDateTime deadline = OffsetDateTime.parse(arg[1]);
-                    tasks = gatewayApi.getTasks(chatId, null, deadline);
+                    OffsetDateTime deadline = dateTimeParser.parseUserDate(arg[1]);
+                    tasks = gatewayApi.getTasks(chatId, new GetTasksRequest(null, deadline)).getBody();
                 } else {
-                    tasks = gatewayApi.getTasks(chatId, arg[1], null);
+                    tasks = gatewayApi.getTasks(chatId, new GetTasksRequest(arg[1], null)).getBody();
                 }
-            } else if (arg.length == 3) {
-                OffsetDateTime deadline = OffsetDateTime.parse(arg[2]);
-                tasks = gatewayApi.getTasks(chatId, arg[1], deadline);
             } else {
-                tasks = gatewayApi.getTasks(chatId, null, null);
+                tasks = gatewayApi.getTasks(chatId, new GetTasksRequest(null, null)).getBody();
             }
             sendTaskList(chatId, tasks);
         } catch (Exception e) {
-            sendMessageToUser(chatId, "❌ Ошибка получения задач: " + e.getMessage(), commandType.getType());
+            log.error("Ошибка обработки команды {}", text, e);
+            sendMessageToUser(
+                    chatId,
+                    "❌ Ошибка получения задач: " + e.getMessage(),
+                    commandType.getType()
+            );
         }
     }
 
-    private void sendTaskList(Long chatId, List<Task> tasks) {
+    private void sendTaskList(Long chatId, List<TaskResponse> tasks) {
         if (tasks.isEmpty()) {
             sendMessageToUser(chatId, "📭 Задачи не найдены.", CommandType.TASKS.getType());
             return;
@@ -83,13 +100,12 @@ public class GetListTasksCommandHandler extends AbstractCommandHandler {
 
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         StringBuilder sb = new StringBuilder("📋 Список задач:\n\n");
-        for (Task task : tasks) {
-            sb.append("🆔 ID: ").append(task.getId()).append("\n");
-            sb.append("📌 Название: ").append(task.getTitle()).append("\n");
-            sb.append("📊 Статус: ").append(task.getStatus()).append("\n");
-            sb.append("⏳ Дедлайн: ").append(task.getAtEnded()).append("\n");
+        for (TaskResponse task : tasks) {
+            sb.append("📌 Название: ").append(task.title()).append("\n");
+            sb.append("📊 Статус: ").append(task.status()).append("\n");
+            sb.append("⏳ Дедлайн: ").append(dateTimeParser.formatForUser(task.endedAt())).append("\n");
             sb.append("───────────────────\n");
-            String callbackData = "delete_task_" + task.getId().toString();
+            String callbackData = "delete_task_" + task.id().toString();
             markup.addRow(new InlineKeyboardButton("🗑 Удалить")
                     .callbackData(callbackData));
         }

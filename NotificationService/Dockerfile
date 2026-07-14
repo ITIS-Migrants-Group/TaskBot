@@ -8,8 +8,9 @@ COPY documentation-service/pom.xml documentation-service/pom.xml
 COPY migrants-logging-spring-boot-starter/pom.xml migrants-logging-spring-boot-starter/pom.xml
 COPY todo/pom.xml todo/pom.xml
 COPY userservice/pom.xml userservice/pom.xml
-
-RUN mvn -B -pl NotificationService -am dependency:go-offline
+COPY ApiGateway/pom.xml ApiGateway/pom.xml
+COPY ContactService/pom.xml ContactService/pom.xml
+COPY bot/pom.xml bot/pom.xml
 
 COPY NotificationService/src NotificationService/src
 RUN mvn -B -pl NotificationService -am package -DskipTests
