@@ -114,9 +114,13 @@ public enum CommandType {
                 : type;
     }
     public static CommandType getCommandTypeFromString(String text) {
+        if (text == null) {
+            return UNKNOWN;
+        }
         String commandPart = text.toLowerCase().split(" ")[0];
         for (CommandType type : values()) {
-            if (type.type.equals(commandPart)) {
+            if (type.type.equals(commandPart)
+                    || type.buttonText.equals(text)) {
                 return type;
             }
         }

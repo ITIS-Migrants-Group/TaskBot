@@ -15,12 +15,15 @@ import ru.itis.migrants.bot.commands.DialogHandler;
 import ru.itis.migrants.bot.dto.request.CreateTaskRequest;
 import ru.itis.migrants.bot.dto.response.TaskResponse;
 import ru.itis.migrants.bot.models.TaskDialogData;
+import ru.itis.migrants.bot.models.enums.CommandType;
 import ru.itis.migrants.bot.models.enums.DialogState;
 import ru.itis.migrants.bot.models.enums.NotifyPeriod;
 import ru.itis.migrants.bot.services.UserStateService;
 import ru.itis.migrants.bot.utils.DateTimeParser;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
@@ -52,7 +55,7 @@ public class AddTaskDialogHandlerImpl implements DialogHandler {
         if (text == null) return false;
         Long chatId = message.chat().id();
 
-        if (text.equals("/addtask")) {
+        if (text.equals(CommandType.ADDTASK.getType()) || text.equals(CommandType.ADDTASK.getButtonText())) {
             return true;
         }
         if (text.equals("/cancel")) {
@@ -87,7 +90,7 @@ public class AddTaskDialogHandlerImpl implements DialogHandler {
         Long chatId = message.chat().id();
         String text = message.text();
 
-        if (text.equals("/addtask")) {
+        if (text.equals(CommandType.ADDTASK.getType()) || text.equals(CommandType.ADDTASK.getButtonText())) {
             userStateService.clearTaskDialog(chatId);
             userStateService.clearState(chatId);
             TaskDialogData data = userStateService.getTaskDialog(chatId);
@@ -128,7 +131,7 @@ public class AddTaskDialogHandlerImpl implements DialogHandler {
                     userStateService.setState(chatId, DialogState.AWAITING_NOTIFY_PERIOD);
                     sendPeriodSelection(chatId);
                 } catch (DateTimeParseException e) {
-                    sendMessage(chatId, "Неверный формат даты. Используйте формат ISO 8601 (например, 2026-07-15T12:00:00+04:00):");
+                    sendMessage(chatId, "Неверный формат даты. Используйте формат dd.mm.YYYY hh:mm:");
                 }
                 break;
 

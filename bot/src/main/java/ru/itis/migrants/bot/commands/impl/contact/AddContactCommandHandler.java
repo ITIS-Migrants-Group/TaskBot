@@ -15,6 +15,7 @@ import ru.itis.migrants.bot.dto.request.CreateContactRequest;
 import ru.itis.migrants.bot.dto.response.ContactResponse;
 import ru.itis.migrants.bot.models.ContactDialogData;
 
+import ru.itis.migrants.bot.models.enums.CommandType;
 import ru.itis.migrants.bot.models.enums.DialogState;
 import ru.itis.migrants.bot.services.UserStateService;
 
@@ -35,7 +36,7 @@ public class AddContactCommandHandler implements DialogHandler {
         if (text == null) return false;
         Long chatId = message.chat().id();
 
-        if (text.equals("/addcontact")) {
+        if (text.equals(CommandType.ADDCONTACT.getType()) || text.equals(CommandType.ADDCONTACT.getButtonText())) {
             return true;
         }
 
@@ -57,7 +58,7 @@ public class AddContactCommandHandler implements DialogHandler {
         Long chatId = message.chat().id();
         String text = message.text();
 
-        if (text.equals("/addcontact")) {
+        if (text.equals(CommandType.ADDCONTACT.getType()) || text.equals(CommandType.ADDCONTACT.getButtonText())) {
             userStateService.clearAll(chatId);
             userStateService.setState(chatId, DialogState.AWAITING_CONTACT_NAME);
             sendMessage(chatId, "Введите имя контакта (обязательно):");
