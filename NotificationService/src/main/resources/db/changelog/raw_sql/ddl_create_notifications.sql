@@ -4,7 +4,7 @@ CREATE TABLE notification (
     title VARCHAR(1023) NOT NULL,
     task_id UUID,
     type VARCHAR(50) NOT NULL,
-    notify_at TIMESTAMP NOT NULL,
+    notify_at TIMESTAMPTZ  NOT NULL,
     period INTERVAL,
     is_active BOOLEAN NOT NULL DEFAULT true
 )

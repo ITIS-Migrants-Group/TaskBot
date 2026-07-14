@@ -22,7 +22,9 @@ public class NotificationScheduler {
     public void schedule() {
         OffsetDateTime now = OffsetDateTime.now();
         log.debug("Работа планировщика");
+        log.debug("Время до которого ищутся уведомления: {}", now);
         List<NotificationResponse> response = notificationService.getForScheduler(now);
+        log.debug("список найденных уведомлений: {}", response);
         sendService.sendNotifications(response);
     }
 }

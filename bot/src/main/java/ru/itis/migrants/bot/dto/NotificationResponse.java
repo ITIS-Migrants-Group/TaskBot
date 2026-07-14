@@ -10,9 +10,9 @@ public record NotificationResponse
                 UUID id,
                 long ownerId,
                 String title,
-                Optional<UUID> taskId,
+                UUID taskId,
                 NotificationType type,
                 OffsetDateTime notifyAt,
-                Optional<Duration> period,
+                Duration period,
                 boolean isActive
         ) {}

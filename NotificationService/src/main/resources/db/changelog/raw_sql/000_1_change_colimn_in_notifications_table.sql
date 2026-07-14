@@ -1,0 +1,3 @@
+ALTER TABLE notification
+ALTER COLUMN notify_at TYPE TIMESTAMPTZ
+USING notify_at AT TIME ZONE 'UTC';

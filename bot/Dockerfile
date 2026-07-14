@@ -13,7 +13,6 @@ COPY ContactService/pom.xml ContactService/pom.xml
 COPY bot/pom.xml bot/pom.xml
 COPY migrants-logging-spring-boot-starter/src migrants-logging-spring-boot-starter/src
 
-
 COPY bot/src bot/src
 RUN mvn -B -pl bot -am package -DskipTests
 

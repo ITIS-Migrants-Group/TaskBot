@@ -15,6 +15,8 @@ public class RabbitConsumer {
 
     @RabbitListener(queues = "notification.push.queue")
     public void receiveNotifications(NotificationResponse response) {
+        log.debug("Rabbit received notification: {}", response);
+
         if (response == null) {
             log.error("ERROR: message don't received");
             return;

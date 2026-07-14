@@ -14,6 +14,7 @@ import ru.itis.migrants.bot.dto.enums.NotificationType;
 import ru.itis.migrants.bot.dto.request.CreateNotificationRequest;
 import ru.itis.migrants.bot.dto.response.NotificationResponse;
 import ru.itis.migrants.bot.models.NotificationDialogData;
+import ru.itis.migrants.bot.models.enums.CommandType;
 import ru.itis.migrants.bot.models.enums.DialogState;
 import ru.itis.migrants.bot.services.UserStateService;
 import ru.itis.migrants.bot.utils.DateTimeParser;
@@ -40,7 +41,7 @@ public class AddNotificationDialogHandlerImpl implements DialogHandler {
         if (text == null) return false;
         Long chatId = message.chat().id();
 
-        if (text.equals("/addnotification")) {
+        if (text.equals(CommandType.ADDNOTIFICATION.getType()) || text.equals(CommandType.ADDNOTIFICATION.getButtonText())) {
             return true;
         }
 
@@ -61,7 +62,7 @@ public class AddNotificationDialogHandlerImpl implements DialogHandler {
         Long chatId = message.chat().id();
         String text = message.text();
 
-        if (text.equals("/addnotification")) {
+        if (text.equals(CommandType.ADDNOTIFICATION.getType()) || text.equals(CommandType.ADDNOTIFICATION.getButtonText())) {
             userStateService.clearAll(chatId);
             userStateService.setState(chatId, DialogState.AWAITING_NOTIFICATION_TITLE);
             sendMessage(chatId, "Введите заголовок уведомления (или /skip):");

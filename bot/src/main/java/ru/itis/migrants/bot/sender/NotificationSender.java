@@ -28,11 +28,11 @@ public class NotificationSender {
         if (!response.isActive()) {
             return Optional.empty();
         }
-        StringBuilder builder = new StringBuilder("Новое уведомление:");
-        if (response.taskId().isPresent()) {
+        StringBuilder builder = new StringBuilder("Новое уведомление: \n");
+        if (response.taskId() != null) {
             builder.append(String.format(" приближается дедлайн задачи: %s", response.title()));
         } else {
-            builder.append(String.format(" %s", response.title()));
+            builder.append(String.format("Приближается время завершения простого уведомления: \n%s", response.title()));
         }
         return Optional.of(builder.toString());
     }
