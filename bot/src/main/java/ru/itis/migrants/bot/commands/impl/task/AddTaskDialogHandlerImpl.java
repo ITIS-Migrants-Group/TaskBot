@@ -19,7 +19,9 @@ import ru.itis.migrants.bot.models.enums.DialogState;
 import ru.itis.migrants.bot.models.enums.NotifyPeriod;
 import ru.itis.migrants.bot.services.UserStateService;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
@@ -110,7 +112,7 @@ public class AddTaskDialogHandlerImpl implements DialogHandler {
                 data.setTitle(text);
                 data.setState(DialogState.AWAITING_DEADLINE);
                 userStateService.setState(chatId, DialogState.AWAITING_DEADLINE);
-                sendMessage(chatId, "Введите дедлайн в формате ISO 8601 (например, 2026-07-15T12:00:00+04:00):");
+                sendMessage(chatId, "Введите дедлайн в формате dd.mm.YYYY hh:mm:");
                 break;
 
             case AWAITING_DEADLINE:
@@ -125,7 +127,7 @@ public class AddTaskDialogHandlerImpl implements DialogHandler {
                     userStateService.setState(chatId, DialogState.AWAITING_NOTIFY_PERIOD);
                     sendPeriodSelection(chatId);
                 } catch (DateTimeParseException e) {
-                    sendMessage(chatId, "Неверный формат даты. Используйте формат ISO 8601 (например, 2026-07-15T12:00:00+04:00):");
+                    sendMessage(chatId, "Неверный формат даты. Используйте формат dd.mm.YYYY hh:mm:");
                 }
                 break;
 
@@ -163,10 +165,14 @@ public class AddTaskDialogHandlerImpl implements DialogHandler {
 
     private void createTask(Long chatId, TaskDialogData data) {
         try {
+            LocalDateTime localTime = LocalDateTime.parse(data.getDeadline());
+            OffsetDateTime parsedTime = OffsetDateTime.of(localTime, ZoneOffset.ofHours(3));
+
             CreateTaskRequest request = new CreateTaskRequest()
-                    .deadline(OffsetDateTime.parse(data.getDeadline()))
+                    .deadline()
                     .title(data.getTitle())
-                    .notifyFor(data.getNotifyPeriod());
+                    .notifyFor(parsedTime);
+
             Task task = gatewayClient.createTask(chatId, request);
             sendMessage(chatId, "Задача успешно создана!\n" +
                     "Заголовок: " + task.getTitle() + "\n" +

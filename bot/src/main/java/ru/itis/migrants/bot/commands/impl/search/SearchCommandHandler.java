@@ -44,6 +44,7 @@ public class SearchCommandHandler extends AbstractCommandHandler {
         }
 
         try {
+            //Todo: исправить метод search
             SearchResponse response = defaultApi.search(query);
             if (response.getItems() == null || response.getItems().isEmpty()) {
                 sendMessageToUser(chatId, "🔍 Ничего не найдено по запросу: \"" + query + "\"", commandType);
