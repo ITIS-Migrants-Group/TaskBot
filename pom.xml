@@ -24,6 +24,7 @@
         <module>documentation-service</module>
         <module>ApiGateway</module>
         <module>ContactService</module>
+        <module>bot</module>
     </modules>
 
     <properties>

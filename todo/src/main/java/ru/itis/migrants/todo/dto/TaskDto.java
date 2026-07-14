@@ -1,5 +1,6 @@
 package ru.itis.migrants.todo.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,13 +14,8 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TaskDto {
-
-    @NotNull
-    private Long tgChatId;
-
-    @NotNull
     private String title;
-
-    @NotNull
     private OffsetDateTime deadline;
+    @JsonProperty("notify_for")
+    private String notifyFor;
 }

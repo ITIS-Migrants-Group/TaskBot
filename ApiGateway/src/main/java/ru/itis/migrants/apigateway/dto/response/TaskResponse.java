@@ -9,19 +9,14 @@ import java.time.OffsetDateTime;
 public record TaskResponse(
         String id,
 
-        @JsonProperty("userId")
         Long userId,
 
         String title,
 
-        @JsonProperty("at_created")
-        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
         OffsetDateTime createdAt,
 
-        @JsonProperty("at_ended")
-        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
         OffsetDateTime endedAt,
 
-        TaskStatus status
+        String status
 ) {
 }

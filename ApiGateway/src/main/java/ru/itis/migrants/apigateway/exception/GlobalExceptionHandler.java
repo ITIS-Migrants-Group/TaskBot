@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(WebClientResponseException.class)
@@ -93,7 +93,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     ) {
         var errorResponse = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Внутренняя ошибка сервера",
+                "Внутренняя ошибка сервера. Причина: " + ex.getMessage(),
                 "Попробуйте позже",
                 LocalDateTime.now()
         );

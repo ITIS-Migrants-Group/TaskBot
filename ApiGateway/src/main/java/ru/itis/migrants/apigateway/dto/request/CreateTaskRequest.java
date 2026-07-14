@@ -7,8 +7,6 @@ import java.time.OffsetDateTime;
 public record CreateTaskRequest(
         String title,
         OffsetDateTime deadline,
-
-        @JsonProperty("notify_for")
         String notifyFor
 ) {
 }

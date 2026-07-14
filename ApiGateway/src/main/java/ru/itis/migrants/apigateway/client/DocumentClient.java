@@ -23,6 +23,8 @@ public interface DocumentClient {
             @RequestBody CreateDocumentRequest request
     );
 
-    @GetExchange("/search")
-    ResponseEntity<List<DocumentResponse>> search(@RequestParam String query);
+    @GetExchange("/{tg-id}/search")
+    ResponseEntity<List<DocumentResponse>> search(
+            @PathVariable("tg-id") Long tgId,
+            @RequestParam String query);
 }

@@ -7,6 +7,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +22,7 @@ import ru.itis.migrants.documentation.dto.CreateDocumentRequest;
 import ru.itis.migrants.documentation.dto.DocumentResponse;
 import ru.itis.migrants.documentation.service.DocumentService;
 
+@Slf4j
 @Validated
 @RestController
 @RequestMapping("/documents")
@@ -34,6 +36,7 @@ public class DocumentController {
             @PathVariable @Positive(message = "Telegram id must be positive") Long tgId,
             @Valid @RequestBody CreateDocumentRequest request
     ) {
+        log.debug("Создание документа: {}", request);
         DocumentResponse response = documentService.create(tgId, request);
         return ResponseEntity
                 .created(URI.create("/documents/%d/%s".formatted(tgId, response.id())))
