@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.itis.migrants.bot.models.enums.DialogState;
 
+import java.time.OffsetDateTime;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -16,7 +18,7 @@ public class TaskDialogData {
 
     private String title;
 
-    private String deadline;
+    private OffsetDateTime deadline;
 
     private String notifyPeriod;
 }

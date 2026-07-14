@@ -12,8 +12,10 @@ import ru.itis.migrants.notificationservice.mapper.NotificationMapper;
 import ru.itis.migrants.notificationservice.model.Notification;
 import ru.itis.migrants.notificationservice.repository.NotificationJpaRepository;
 
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -25,13 +27,14 @@ public class NotificationService {
     @Transactional
     public NotificationResponse createNotification(Long tgId, CreateNotificationRequest request) {
         log.info(String.valueOf(request));
+        Duration duration = request.period();
         Notification notification = Notification.builder()
                 .title(request.title())
-                .taskId(request.taskId().orElse(null))
+                .taskId(request.taskId())
                 .ownerId(tgId)
                 .type(request.type())
                 .notifyAt(request.notifyAt())
-                .period(request.period().orElse(null))
+                .period(duration)
                 .isActive(Boolean.TRUE)
                 .build();
 
@@ -44,7 +47,7 @@ public class NotificationService {
     public NotificationResponse updateNotification(UpdateNotificationRequest request) throws EntityNotFoundException {
         Notification entity = notificationJpaRepository.findById(request.id())
                 .orElseThrow(() -> new EntityNotFoundException("Notification not found"));
-        entity.setIsActive(request.isActive());
+        entity.setIsActive(true);
         Notification saved = notificationJpaRepository.save(entity);
         return mapper.fromEntity(saved);
     }

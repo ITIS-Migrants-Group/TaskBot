@@ -18,6 +18,7 @@ app:
     token: ${TELEGRAM_TOKEN}
     update-listener-sleep: 1s
     debug: false
+  timezone: Asia/Yekaterinburg
 
 logging:
   level:

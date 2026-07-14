@@ -12,6 +12,6 @@ public interface ContactMapper {
     ContactResponse fromEntity(Contact entity);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "ownerId", ignore = true)
     void updateEntity(@MappingTarget Contact entity, UpdateContactRequest response);
 }

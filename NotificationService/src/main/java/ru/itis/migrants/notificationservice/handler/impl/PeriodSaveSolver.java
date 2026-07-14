@@ -39,6 +39,8 @@ public class PeriodSaveSolver implements SaveSolver {
 
     @Override
     public boolean support(NotificationResponse response) {
-        return response.isActive() && response.period().isPresent() && response.type().equals(NotificationType.PERIOD);
+        return response.isActive()
+                && response.period() != null
+                && response.type().equals(NotificationType.PERIOD);
     }
 }

@@ -1,11 +1,13 @@
 package ru.itis.migrants.todo.controllers;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.itis.migrants.todo.controller.api.TasksApi;
+import ru.itis.migrants.todo.dto.GetTasksRequest;
 import ru.itis.migrants.todo.dto.TaskDto;
-import ru.itis.migrants.todo.dto.TaskFilterRequestDto;
+
 import ru.itis.migrants.todo.dto.TaskUpdateDto;
 import ru.itis.migrants.todo.model.TaskResponseDto;
 import ru.itis.migrants.todo.services.TaskService;
@@ -14,6 +16,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/tasks")
 @RequiredArgsConstructor
@@ -24,13 +27,12 @@ public class TaskController implements TasksApi {
     @PostMapping("/{tg-id}")
     public ResponseEntity<TaskResponseDto> createTask(
             @PathVariable("tg-id") Long tgId,
-            String title,
-            OffsetDateTime deadline
+            @RequestBody TaskDto taskDto
     ) {
-        TaskResponseDto responseDto = taskService.create(TaskDto.builder()
-                .tgChatId(tgId)
-                .title(title)
-                .deadline(deadline)
+        log.debug("Создание задачи: {}, {}, {}", tgId, taskDto.getTitle(), taskDto.getDeadline());
+        TaskResponseDto responseDto = taskService.create(tgId, TaskDto.builder()
+                .title(taskDto.getTitle())
+                .deadline(taskDto.getDeadline())
                 .build());
         return ResponseEntity.ok().body(responseDto);
     }
@@ -38,20 +40,21 @@ public class TaskController implements TasksApi {
     @GetMapping("/{tg-id}")
     public ResponseEntity<List<TaskResponseDto>> getFilteredTasks(
             @PathVariable("tg-id") Long tgChatId,
-            @RequestParam(value = "status", required = false) String status,
-            @RequestParam(value = "ended_at", required = false) OffsetDateTime deadline
+            @RequestBody GetTasksRequest request
     ) {
+        log.debug("Получение задач по фильтрам: {}", request);
         return ResponseEntity.ok(
-                taskService.getTasks(tgChatId, status, deadline)
+                taskService.getTasks(tgChatId, request.status(), request.endedAt())
         );
     }
 
     @GetMapping("/{tg-id}/search")
     public ResponseEntity<List<TaskResponseDto>> getByKeyWords(
-            @PathVariable("tg-id") Long tgChatId,
+            @PathVariable("tg-id") Long tgId,
             @RequestParam("query") String query
     ) {
-        return ResponseEntity.ok(taskService.getAllByKeyWords(tgChatId, query));
+        log.debug("Запрос: {}", query);
+        return ResponseEntity.ok(taskService.getAllByKeyWords(tgId, query));
     }
 
     @PatchMapping("/{task-id}")

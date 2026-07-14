@@ -8,7 +8,7 @@ import com.pengrad.telegrambot.request.SendMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.itis.migrants.bot.api.DefaultApi;
+import ru.itis.migrants.bot.client.GatewayClient;
 import ru.itis.migrants.bot.commands.CallbackHandler;
 
 import java.util.UUID;
@@ -19,7 +19,7 @@ import java.util.UUID;
 public class DeleteTaskCallbackHandler implements CallbackHandler {
 
     private final TelegramBot telegramBot;
-    private final DefaultApi gatewayApi;
+    private final GatewayClient gatewayApi;
 
     @Override
     public boolean supports(Update update) {
@@ -37,6 +37,7 @@ public class DeleteTaskCallbackHandler implements CallbackHandler {
         String uuidStr = data.substring("delete_task_".length());
         try {
             UUID taskId = UUID.fromString(uuidStr);
+            log.debug("Удаление задачи: chatId={}, taskId={}", chatId, taskId);
             gatewayApi.deleteTask(chatId, taskId);
 
             telegramBot.execute(new AnswerCallbackQuery(callbackQuery.id())

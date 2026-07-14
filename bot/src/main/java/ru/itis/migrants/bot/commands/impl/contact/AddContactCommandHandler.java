@@ -7,11 +7,12 @@ import com.pengrad.telegrambot.request.SendMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.itis.migrants.bot.api.DefaultApi;
+
+import ru.itis.migrants.bot.client.GatewayClient;
 import ru.itis.migrants.bot.commands.DialogHandler;
 
-import ru.itis.migrants.bot.model.Contact;
-import ru.itis.migrants.bot.model.CreateContactRequest;
+import ru.itis.migrants.bot.dto.request.CreateContactRequest;
+import ru.itis.migrants.bot.dto.response.ContactResponse;
 import ru.itis.migrants.bot.models.ContactDialogData;
 
 import ru.itis.migrants.bot.models.enums.DialogState;
@@ -24,7 +25,7 @@ public class AddContactCommandHandler implements DialogHandler {
 
     private final TelegramBot telegramBot;
     private final UserStateService userStateService;
-    private final DefaultApi defaultApi;
+    private final GatewayClient defaultApi;
 
     @Override
     public boolean supports(Update update) {
@@ -122,25 +123,26 @@ public class AddContactCommandHandler implements DialogHandler {
 
     private void createContact(Long chatId, ContactDialogData data) {
         try {
-            CreateContactRequest request = new CreateContactRequest();
-            request.setName(data.getName());
-            request.setPhoneNumber(data.getPhoneNumber());
-            request.setEmail(data.getEmail());
-            request.setCompany(data.getCompany());
-            request.setNote(data.getNote());
+            CreateContactRequest request = new CreateContactRequest(
+                    data.getName(),
+                    data.getPhoneNumber(),
+                    data.getEmail(),
+                    data.getCompany(),
+                    data.getNote()
+            );
             log.debug("Создание контакта: {}", request);
-            Contact contact = defaultApi.createContact(chatId, request);
+            ContactResponse contact = defaultApi.createContact(chatId, request).getBody();
 
             StringBuilder response = new StringBuilder("✅ Контакт успешно создан!\n");
-            response.append("Имя: ").append(contact.getName()).append("\n");
-            if (contact.getPhoneNumber() != null)
-                response.append("Телефон: ").append(contact.getPhoneNumber()).append("\n");
-            if (contact.getEmail() != null)
-                response.append("Email: ").append(contact.getEmail()).append("\n");
-            if (contact.getCompany() != null)
-                response.append("Компания: ").append(contact.getCompany()).append("\n");
-            if (contact.getNote() != null)
-                response.append("Заметка: ").append(contact.getNote());
+            response.append("Имя: ").append(contact.name()).append("\n");
+            if (contact.phoneNumber() != null)
+                response.append("Телефон: ").append(contact.phoneNumber()).append("\n");
+            if (contact.email() != null)
+                response.append("Email: ").append(contact.email()).append("\n");
+            if (contact.company() != null)
+                response.append("Компания: ").append(contact.company()).append("\n");
+            if (contact.note() != null)
+                response.append("Заметка: ").append(contact.note());
 
             sendMessage(chatId, response.toString());
 
